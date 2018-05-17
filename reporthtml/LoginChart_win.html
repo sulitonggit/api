@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+	    #header{
+	        text-align: center; 
+			background-color: #0883D9; 
+			color: #fff;
+	        width: 100%;
+	    }
+	    #topbar_search {height: 28px;}
+	    .btn_click {background: #DADDE0;}
+	    .h1 {height: 1px;margin-left: 15px;background: #f0f0f0;}
+	    .item {height: 30px;line-height: 30px;padding-left: 15px;background-color: #fff;}	
+    </style>
+</head>
+<body>
+</body>
+<script type="text/javascript">
+	apiready = function()
+	{
+		var pieChart = api.require('pieChart');
+		pieChart.open({
+		    x: api.frameWidth / 2,
+		    y: api.frameHeight / 2,
+		    radius: 100,
+		    center: {
+		        title: '标题',
+		        subTitle: '子标题'
+		    },
+		    elements: [{
+		        value: 10,
+		        color: '#FF6600'
+		    }, {
+		        value: 15,
+		        color: '#660099'
+		    }, {
+		        value: 15,
+		        color: '#FF33FF'
+		    }, {
+		        value: 15,
+		        color: '#66CCFF'
+		    }, {
+		        value: 15,
+		        color: '#00CCFF'
+		    }],
+		    fixedOn: api.frameName,
+		    fixed: false
+		}, function(ret, err) {
+		    if (ret) 
+		    {
+		        //alert(JSON.stringify(ret));
+		    } 
+		    else 
+		    {
+		        alert(JSON.stringify(err));
+		    }
+		});
+	};
+</script>
+</html>

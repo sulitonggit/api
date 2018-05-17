@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title></title>
+
+		<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../script/bootstrap/css/bootstrap.min.css" />
+		<script type="text/javascript" src="../script/bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="../script/yanzhengma/gVerify.js"></script>
+		<script type="text/javascript">
+			function getQueryValue(variable) {
+				var query = window.location.search.substring(1);
+				var vars = query.split("&");
+				for(var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split("=");
+					if(pair[0] == variable) {
+						return pair[1];
+					}
+				}
+				return(false);
+			}
+
+			function isshu(shu) {
+				var myreg = /^[0-9]*$/;
+				debugger;
+				if(!myreg.test(shu)) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		</script>
+		<script type="text/javascript">
+			var doadmin = ""; //域
+			var name = ""; //用户名
+			var phone = ""; //电话
+			var receive = ""; //是否接受短信
+			var type = ""; //用户所在系统（Hr\AD）
+			//-------------
+			function yanzheng() {
+				var res = verifyCode.validate(document.getElementById("verificationcode").value);
+				if(res) {
+					$("#yanzhengtishi").hide();
+					if($("#name1").val() != null && $("#name1").val() !="") {
+						debugger;
+						$.ajax({
+							url: 'http://192.168.237.9:8002/Data/ChangePwd.ashx',
+							data: {
+								Action: "ValidationName",
+								userdomain: $("#userdomain option:selected").val(),
+								user: $("#name1").val()
+							},
+							type: 'get',
+							dataType: 'json',
+							cache: false,
+							async: false,
+							success: function(data) {
+								debugger;
+								if(data.type == "nul") {
+									debugger;
+									alert("没有查询到此域账户");
+								} else {
+									phone = data.phone;
+									debugger;
+									doadmin = $("#userdomain option:selected").val();
+									name = $("#name1").val();
+									receive = data.receive;
+									type = data.type;
+									$(".citem").hide();
+									$(".two").show();
+									givevalue();
+									//window.location.href = "../../Home/login2?phone=" + data.phone + "&name=" + $("#value1").val() + "&receive=" + data.receive + "&type=" + data.type;
+								}
+							},
+							fail: function(err, status) {
+
+								alert("操作失败！");
+							}
+						})
+					} else {
+						alert("输入的域账户为空！");
+					}
+				} else {
+					$("#yanzhengtishi").show();
+				}
+			}
+			//-----------
+			var yanzhengma = ""; //随机验证码
+			function givevalue() {
+				debugger;
+				var phone1 = phone.replace(/(\d{3})\d{5}(\d{3})/, '$1*****$2');
+				debugger;
+				if(isshu(phone)) {
+					debugger;
+					$("#phone").html(phone1);
+				} else {
+					debugger;
+					$("#phone").html("错误的手机号");
+				}
+				//随机验证码
+				var Num = "";
+				for(var i = 0; i < 6; i++) {
+					Num += Math.floor(Math.random() * 10);
+				}
+				yanzhengma = Num;
+			}
+
+			function sendmsg() {
+				//					stopCount();
+				//					cs();
+				//					timedCount();
+				//					alert("验证码发送成功");
+				debugger;
+				if(receive != "1") {
+					debugger;
+					$.ajax({
+						url: 'http://192.168.237.9:8002/Data/ChangePwd.ashx',
+						data: {
+							Action: "Sendcode",
+							phone: phone,
+							code: yanzhengma
+						},
+						type: 'get',
+						dataType: 'text',
+						cache: false,
+						async: false,
+						success: function(data) {
+							debugger;
+							if(data == "success") {
+								stopCount();
+								cs();
+								timedCount();
+								alert("验证码发送成功");
+								debugger;
+							} else {
+								alert("验证码发送失败！");
+							}
+						},
+						fail: function(err, status) {
+							debugger;
+							alert("验证码发送失败！");
+						}
+					})
+				} else {
+					debugger;
+					alert("此用户不接受短信验证码，请在eip中设置为允许！")
+				}
+			}
+
+			function yanzheng2() {
+						$("#duanxintishi").hide();
+						$(".citem").hide();
+						$(".three").show();
+//				stopCount();
+//				if(c <= 300) {
+//					if(yanzhengma == $("#yanzhengma1").val()) {
+//						$("#duanxintishi").hide();
+//						$(".citem").hide();
+//						$(".three").show();
+//						//window.location.href = "../../Home/login3?phone=" + phone + "&name=" + name;
+//					} else {
+//						$("#duanxintishi").show();
+//					}
+//				} else {
+//					alert("验证码已失效，验证码仅在5分钟内有效！")
+//				}
+
+			}
+
+			var c = 0;
+			var t;
+
+			function timedCount() {
+
+				c = c + 1;
+				if(c <= 30) {
+					//					$("#sendbtn").hide();
+					//					$("#sendbtn1").show();
+					$("#sendbtn").attr('disabled', 'disabled');
+					$("#sendtimeconter").show();
+					$("#sendtime").html(30 - c);
+				} else {
+					//					$("#sendbtn").show();
+					//					$("#sendbtn1").hide();
+					$("#sendbtn").removeAttr('disabled');
+					$("#sendtimeconter").hide();
+				}
+				t = setTimeout("timedCount()", 1000);
+			}
+
+			function stopCount() {
+
+				clearTimeout(t);
+
+			}
+
+			function cs() {
+
+				c = 0;
+
+			}
+			//--------------
+			function yanzheng3() {
+				debugger;
+				if(ispassword($("#newpwd1").val())) {
+					$("#fuzatishi").hide();
+					if($("#newpwd1").val() == $("#newpwd2").val()) {
+						debugger;
+						$("#butongtishi").hide();
+						$.ajax({
+							url: 'http://192.168.237.9:8002/Data/ChangePwd.ashx',
+							data: {
+								Action: "changepwd",
+								userdomain: doadmin,
+								user: name,
+								password: $("#newpwd1").val()
+
+							},
+							type: 'get',
+        					dataType: 'text',
+							cache: false,
+							async: false,
+							success: function(data) {
+								debugger;
+								if(data == "success") {
+									alert("密码修改成功！");
+									debugger;
+								} else {
+									alert("密码修改失败！");
+								}
+							},
+							fail: function(err, status) {
+								debugger;
+								alert("密码修改失败！");
+							}
+						})
+					} else {
+						debugger;
+						$("#butongtishi").show();
+					}
+				} else {
+					debugger;
+					$("#fuzatishi").show();
+				}
+			}
+			//密码复杂度6-20位字母数字组合
+			function ispassword(str) {
+				//var myreg = /^[A-Za-z0-9]{6,20}$/;
+				var myreg = new RegExp('(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}');
+				debugger;
+				if(!myreg.test(str)) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		</script>
+		<style>
+			.pad{
+				margin-top: 10px;
+			}
+			.layui-form-select dl dd {
+				background-color: #878789
+			}
+			
+			.layui-form-select dl dd:hover {
+				background-color: #1882FC
+			}
+			
+			.layui-form-select dl dd.layui-this {
+				background-color: #5FB878
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+		<!--<div data-role="header" data-position="fixed" style="text-align: center;background: #E9E9E9;">
+	        <img src="../image/logo.png" class="img-responsive" width="100%" alt="logo" />
+		</div>-->
+			<div class="grid-demo layui-bg-black citem one">
+
+				<center>
+					<h2>第一步</h2>
+				</center>
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-home "></span>选择域：</span>
+						<select id="userdomain" name="userdomain" class="form-control">
+							<option value="SAILUNJINYU">SAILUNJINYU</option>
+							<option value="JINYUTYRES">JINYUTYRES</option>
+							<option value="JINYUTIRES">JINYUTIRES</option>
+							<option value="SAILUNTYRE">SAILUNTYRE</option>
+							<option value="SVTYRE">SVTYRE</option>
+							<option value="PEACEDOVETYRE">PEACEDOVETYRE</option>
+							<option value="SAILUNGROUP">SAILUNGROUP</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-user "></span>账户名：</span>
+						<input type="text" id="name1" name="name1" class="form-control" placeholder="例:zhangsan">
+					</div>
+				</div>
+
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<center>
+						<div class="input-group pad">
+							<span class="input-group-addon"><span class="glyphicon glyphicon-th-large "></span>验证码：</span>
+							<input type="text" id="verificationcode" name="verificationcode" class="form-control" placeholder="请输入验证码">
+
+						</div>
+						<p id="yanzhengtishi" style="color:red;display:none;">输入的验证码错误</p>
+						<div id="v_container" class="pad" style="width: 170px;height: 50px;"></div>
+					</center>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="pad">
+					<button type="button" class="btn btn-info btn-block" onclick="yanzheng()">下一步</button>
+					</div>
+				</div>
+			</div>
+			<br />
+			<div class="grid-demo layui-bg-black citem two" style="display:none;"><!--style="display:none;"-->
+
+				<center>
+					<h2>第二步</h2> 点击[发送]向以下手机号发送短信验证码
+				</center>
+
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon">手机号：</span>
+					<b id="phone"></b>
+					<button class="btn btn-info" id="sendbtn" type="button" onclick="sendmsg()">发送<ab id="sendtimeconter" style="display: none;">（<ab id="sendtime">26</ab>秒）</ab></button>
+					<!--<button class="btn btn-info" id="sendbtn1" style="display:none;" type="button">发送（<ab id="sendtime">26</ab>秒）</button>-->
+
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon">验证码：</span>
+						<input type="text" id="yanzhengma1" name="yanzhengma1" class="form-control" placeholder="请输入短信验证码">
+
+					</div>
+					<p id="duanxintishi" style="color:red;display:none;">输入的短信验证码不正确</p>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="pad">
+					<button type="button" class="btn btn-info btn-block" onclick="yanzheng2()">下一步</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid-demo layui-bg-black citem three" style="display:none;">
+				<center>
+					<h2>第三步</h2>
+				</center>
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon">新密码：</span>
+						<input type="password" id="newpwd1" name="newpwd1" class="form-control" placeholder="请输入新密码">
+
+					</div>
+					<p id="fuzatishi" style="color:red;display:none;">输入的密码应由字母、数字和特殊字符组成的8-30位的字符串</p>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+					<div class="input-group pad">
+						<span class="input-group-addon">重新输入：</span>
+						<input type="password" id="newpwd2" name="newpwd2" class="form-control" placeholder="请再次输入新密码">
+
+					</div>
+					<p id="butongtishi" style="color:red;display:none;">两次输入的密码不相同</p>
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="pad">
+					<button type="button" class="btn btn-info btn-block" onclick="yanzheng3()">确定</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<!--<script type="text/javascript" src="../script/yanzhengma/gVerify.js"></script>-->
+		<script>
+			var verifyCode = new GVerify("v_container");
+		</script>
+	</body>
+
+</html>

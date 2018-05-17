@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+    <script type="text/javascript" src="../script/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+
+    </script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div id='form' class="container-fluid">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var username=localStorage.getItem('username');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/workflow.ashx";
+	var formitem = [];
+	var NodeNamelist = [];
+	
+    function each(arr, callback){
+        for(var idx in arr)
+        {
+            formitem = arr[idx];
+
+            if("function" === typeof callback)
+            {
+                callback(idx, formitem);
+            }
+        }
+    };
+ 	  
+	apiready = function()
+	{
+        //显示加载动画
+		api.showProgress({});
+		//获取流程节点数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataTpye:'json',
+			data: {values:{k:'GetMyDoListNodeName',ADAccount:username,FormID:FormID}}
+	        
+        },function(ret,err)
+        {
+        	if (ret)
+        	{
+        		NodeNamelist=ret
+        		//api.alert({msg:JSON.stringify(NodeName)});
+        	}
+        	else
+        	{
+        		api.alert({msg:JSON.stringify(err)});
+        	}
+        });
+		//从服务器获取流程字段数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataTpye:'json',
+			data: {values:{k:'GetMyDoListForm',ADAccount:username,FormID:FormID}}
+	        
+        },function(ret,err)
+        {
+        	//如果返回成功返回结果
+        	if (ret)
+        	{
+        		var inputGroupStr="<div class='page-header'><h3 align='center'>"+NodeNamelist[0].ProcessFullName+JSON.stringify( api.pageParam.FormID )+"</h3></div>";
+				var inputGroupWidth = 12;
+				//alert(JSON.stringify(NodeNamelist));
+				//从流程节点里循环取数据
+				for(var idx in NodeNamelist)
+				{
+					var NodeName;
+					NodeName = NodeNamelist[idx].NodeName;
+					inputGroupStr += "<div class='row'>";
+					inputGroupStr += "<div class='col-xs-12'><h4>"+NodeName+"</h4>";
+					inputGroupStr += "<div class='row'>";
+					//循环取出每个节点的数据
+					each(ret, function(index, inputInfo)
+					{
+						if (ret[index].NodeName==NodeName)
+						{
+							var label = inputInfo.xColumnName || "标签" + index;
+							var type = inputInfo.type || "text";
+							var id = inputInfo.xColumn || "";
+							var placeholder = inputInfo.xColumnName || "";
+							var disabled = (inputInfo.isDisabled=="disabled") ? "disabled" : "";
+							var value = inputInfo.Data || "";
+							var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='" + type + "' class='form-control' placeholder='" + placeholder + "' id='" + id + "' " + disabled + " value='" +value+ "' /></div></div>";
+							inputGroupStr += inputStr;
+						}
+					});					
+
+					inputGroupStr += '</div></div></div>';
+				}
+				document.getElementById ("form").innerHTML = inputGroupStr;	       		
+        	}
+        	else 
+        	{
+         		api.alert({msg:JSON.stringify(err)});
+         	}
+	        ///隐藏加载
+			api.hideProgress();
+        });
+
+	};
+
+</script>
+</html>

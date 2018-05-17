@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        #header {
+            text-align: center;
+            background-color: #0883D9;
+            color: #fff;
+            width: 100%;
+        }
+
+        #topbar_search {
+            height: 28px;
+        }
+
+        .btn_click {
+            background: #DADDE0;
+        }
+
+        .h1 {
+            height: 1px;
+            margin-left: 15px;
+            background: #f0f0f0;
+        }
+
+        .item {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 15px;
+            background-color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+<div id="wrap">
+    <div id="header" class="header">
+        <div class="btn back" onclick="api.closeWin()"></div>
+        <div class="title" id="title"></div>
+        <div class="btn"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        //修改头标题
+        var dom_title = $api.byId('title');
+        $api.text(dom_title, api.pageParam.title );
+
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+        var headerH = $api.offset(header).h;
+        var footerH = 0;
+        var frameH = api.winHeight - headerH - footerH;
+
+        var username = localStorage.getItem('username');
+        var parts = username ? username.split("\\"): ['', ''];
+        var password = escape(localStorage.getItem('password'));
+        var targeturl = api.pageParam.targeturl;
+
+        var domain = parts[0];
+        var account = parts[1];
+    //https://smartforms.sailunjinyu.com/WinAuthMobile/Auth.html?domain=sailunjinyu&account=fangdl&userpwd=Ww123456&targeturl=https://smartforms.sailunjinyu.com/Runtime/Runtime/Form/OfficalCarApplyCreate1/
+        url_remote = 'https://smartforms.sailunjinyu.com/WinAuthMobile/Auth.html?domain=' + domain + '&account=' + account + '&userpwd=' + password + '&targeturl=' + targeturl, //测试网站
+
+        api.openFrame({
+            name: 'WFStartApplyRemote_frm',
+            url: url_remote,
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+        });
+    };
+</script>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        #header {
+            text-align: center;
+            background-color: #0883D9;
+            color: #fff;
+            width: 100%;
+        }
+
+        #topbar_search {
+            height: 28px;
+        }
+
+        .btn_click {
+            background: #DADDE0;
+        }
+
+        .h1 {
+            height: 1px;
+            margin-left: 15px;
+            background: #f0f0f0;
+        }
+
+        .item {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 15px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var serverurl = "https://smartforms.sailunjinyu.com/eipmobile/workflow.ashx";
+    //var serverurl = "http://192.168.237.18:8090/eipmobile/workflow.ashx";
+    var UIListView;
+    var username = localStorage.getItem('username');
+
+    apiready = function () {
+        //获取数据
+        api.showProgress();
+        api.ajax({
+            url: serverurl,
+            method: 'post',
+            type: 'json',
+            data: {
+                values: {
+                    k: 'GetFavoriteWFList',
+                    UserAccount: username
+                }
+            }
+        }, function (ret, err) {
+            //数据模拟
+            if (ret) {
+                //alert(JSON.stringify(ret));
+                /*
+                ret=[
+                {"url_remote":"https://smartforms.sailunjinyu.com/Runtime/Runtime/Form/ComplementCardCreate/","title":"考勤补卡流程"},
+                {"url_remote":"https://smartforms.sailunjinyu.com/Runtime/Runtime/Form/LeaveCreate/","title":"请假流程"}
+                ];
+                */
+                loadUIListView(ret);
+                
+            } else {
+                alert(JSON.stringify(err));
+                //alert('加载数据失败，请稍后重试')
+            }
+            api.hideProgress();
+        });
+    };
+
+    //加载UIListView，并且加载数据
+    function loadUIListView(data) {
+        UIListView = api.require('UIListView');
+        UIListView.open({
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.frameHeight
+            },
+            data: data,
+            rightBtns: [],
+            styles: {
+                borderColor: '#696969',
+                item: {
+                    bgColor: '#FFF',
+                    activeBgColor: '#F5F5F5',
+                    height: 55.0,
+                    imgWidth: 40,
+                    imgHeight: 40,
+                    imgCorner: 4,
+                    placeholderImg: '',
+                    titleSize: 12.0,
+                    titleColor: '#000',
+                    subTitleSize: 12.0,
+                    subTitleColor: '#000',
+                    remarkColor: '#000',
+                    remarkSize: 16,
+                    remarkIconWidth: 30
+                }
+            },
+            fixedOn: api.frameName
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.eventType == 'clickContent') { //点击去发起流程
+                    UIListView.getDataByIndex({
+                                index: ret.index
+                            }, function (ret, err) {
+                                if (ret) {
+                                    //alert(JSON.stringify(ret.data));
+                                    //加载流程页面                                 
+                                    openStartApplyRemoteWin(ret.data);
+                                } else {
+                                    alert('读取不到流程的远程地址，请退出重试');
+                                }
+                            }
+                    );
+                }
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+    function openStartApplyRemoteWin(data) {
+
+        api.openWin({
+            name: 'WFStartApplyRemote_win',
+            url: 'WFStartApplyRemote_win.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {
+                title: data.title,
+                targeturl:data.targeturl
+            }
+        });
+    }
+</script>
+</html>

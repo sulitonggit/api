@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+		tinymce.init({
+			'selector':'textarea',
+			'toolbar':false,
+			'statusbar':false,
+			'menubar':false,
+			'readonly':false,
+			'height':150
+			});
+    </script>
+
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="form" class="container-fluid">
+  <div class="page-header">
+    <h3 align="center">追问</h3></div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <h4></h4>
+      <div class="row">
+		<div class='col-xs-12'>
+			<div class='input-group'><span class='input-group-addon'><strong>问题描述</strong></span>
+			<textarea id='Questions' rows="5" value='ss'></textarea>
+			</div>
+		</div>
+        <div class="col-xs-12">
+          <h4></h4>
+        </div>
+        <div class="col-xs-12">
+          <div class="btn-group btn-group-justified">
+            <div class="btn-group">
+              <input type="button" class="btn btn-success" id="Agreed" value="提交" onclick="SubmitQuestion()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript">
+	var username=localStorage.getItem('badge'); //localStorage.getItem('username');解决没有域账号员工提问空白问题
+	var AddrBookListView;
+	var ABretlist=[];
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";//"https://smartforms.sailunjinyu.com/eipmobiledemo/ashx/normal.ashx";
+	var QuestionsType;
+	var QuestionsTitle;
+	var Question;
+	var RootID;
+
+	function SubmitQuestion()
+	{
+		if(tinyMCE.get("Questions").getContent({'format':'text'}).replace(/\"/g,"”")=='')
+		{
+			alert('问题描述必须填写');
+		}
+		else
+		{
+			Question=tinyMCE.get("Questions").getContent({'format':'text'}).replace(/\"/g,"”");
+
+			api.showProgress({});
+			api.ajax({
+				url:serverurl,
+		        method: 'post',
+		        dataType:'text',
+				data: {values:{k:'MobileReAddAskList',ADAccount:username,RootID:RootID,Question:Question}}
+            },function(ret,err)
+            {
+            	if (ret=='ok')
+				{
+					alert("提交成功！");
+					api.closeWin({});
+				}
+				else
+			    {
+			         alert( JSON.stringify( err ) );
+			         api.hideProgress();
+			    }
+            });
+		}
+	}
+
+	apiready = function()
+	{
+		RootID=api.pageParam.RootID;
+	};
+
+</script>
+</html>

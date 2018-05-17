@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>每日考勤</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    
+    <style>
+        .padding-5{
+            padding-left:5px;
+            padding-right:5px;
+        }
+        form{
+            margin-top:15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+        <form action="" class="form-inline">
+                <div class="form-group col-xs-5 padding-5">
+                    <input type="text" class="form-control" name="start_date" readonly placeholder="开始日期">
+                </div>
+                <div class="form-group col-xs-5 padding-5">
+                    <input type="text" class="form-control" name="end_date" readonly placeholder="结束日期">
+                </div>
+                <div class="form-group col-xs-2 padding-5">
+                    <button class="btn btn-primary">查询</button>
+                </div>
+        </form>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    var UIListView;
+    var y; // 用来设置UIListView距离上边的高度
+    var serverUrl="https://smartforms.sailunjinyu.com/eipmobile/Attendance.ashx";
+
+    $(document).ready(function(){
+        y= $('.container').outerHeight();
+        
+        //默认加载的时候是 当月1号 到 当前访问日期
+        var obj_date = new Date();
+        var start_date = obj_date.getFullYear() + "-" + (obj_date.getMonth() + 1) + "-" + "1";
+        var end_date = obj_date.getFullYear() + "-" + (obj_date.getMonth() + 1) + "-" + obj_date.getDate();
+        $('input[name="start_date"]').val(start_date);
+        $('input[name="end_date"]').val(end_date);
+    });
+    
+    apiready = function () {     
+        //加载UIListView组件
+        UIListView = api.require('UIListView');
+
+        //发送数据，进行访问
+        bindData();
+        
+         //监听输入框点击
+        $('input').click(function () {
+            var _this = $(this);
+
+            api.openPicker({
+                type: 'date',
+                //date: date_now, //2016/10/27 默认是当前时间
+                title: '选择日期'
+            }, function (ret, err) {
+                if (ret) {
+                    var date = ret.year + '-' + ret.month + '-' + ret.day;
+                    _this.val(date);
+                } else {
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+
+        //监听查询按钮点击
+        $('.btn.btn-primary').click(function () {
+            //进行日期检查:空、大小
+            var start_date_val = $('input[name="start_date"]').val().trim();
+            var end_date_val = $('input[name="end_date"]').val().trim();
+            if(start_date_val == ''){
+                alert('请设置起始日期');
+                return false;
+            }
+            
+            
+            if(end_date_val == ''){
+                alert('请设置结束日期');
+                return false;
+            }
+
+            var start_date = Date.parse(start_date_val.replace(/-/g,   "/"));
+            var end_date =  Date.parse(end_date_val.replace(/-/g,   "/"));
+            if(end_date - start_date < 0){
+                alert('结束日期 大于了 起始日期');
+                return false;
+            }
+
+            //调用frame页面的数据重绑定脚本
+           // var script_str = 'bindData("' + start_date_val + '","' + end_date_val + '")';
+
+/*
+            api.execScript({
+                frameName: 'DailyAttendance_frm',
+                script:script_str
+            });
+*/
+            bindData(start_date_val, end_date_val);
+            //屏蔽表单提交默认动作
+            return false;
+        });
+    };
+
+    //UIListView 样式配置
+    var styles = {
+        borderColor: '#696969',
+        item: {
+            bgColor: '#fff',
+            activeBgColor: '#F5F5F5',
+            height: 55.0,
+            imgWidth: 40,
+            imgHeight: 40,
+            imgCorner: 4,
+            placeholderImg: '',
+            titleSize: 12.0,
+            titleColor: '#000',
+            subTitleSize: 12.0,
+            subTitleColor: '#000',
+            remarkColor: '#000',
+            remarkSize: 16,
+            remarkIconWidth: 30
+        }
+    };
+
+    //数据绑定
+    function bindData(start_date, end_date) {
+        //alert(start_date);
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '数据加载中...',
+            text: '',
+            modal: false
+        });
+        
+        //异步加载      
+        api.ajax({
+            url: serverUrl,
+            method: 'post',
+            type: 'json',
+            data: {
+                values: {
+                    k: 'DailyAttendance',
+                    BDate: start_date ? start_date : '',
+                    EDate: end_date ? end_date : '',                   
+                    Badge: localStorage.getItem('badge'),
+                    Type: '1', //说明执行数据库存储过程的每日查询
+                    FindStr: ''
+                }
+            }
+        }, function (ret, err) {
+            if (ret) { //取到数据
+                // alert(JSON.stringify(ret));
+                var arr_data = []; //TODO 进行数据填充
+                for (i in ret) {
+                    arr_data.push({
+                        uid: ret[i].title, //将时间作为一个uid
+                        title: ret[i].title,
+                        subTitle: ret[i].subTitle,
+                        remark: ret[i].remark
+                    });
+                }
+                //如果传递过来的有时间参数，则是二次数据绑定，直接调用reloadData方法
+                if (start_date) {
+                    // alert(JSON.stringify(arr_data);
+                    UIListView.reloadData({
+                        data: arr_data
+                    }, function (ret) {
+                        api.hideProgress();
+                        if (ret && ret.status) {
+                            $api.toast('加载成功!');
+                        } else {
+                            alert('加载失败!');
+                        }
+                    });
+
+                    return false; //不再执行下边的程序
+                }
+                
+                //否则是初次加载
+                UIListView.open({
+                            rect: {
+                                x: 0,
+                                y: y,
+                                w: api.winWidth,
+                                h: api.frameHeight - y
+                            },
+                            data: arr_data,
+                            styles: styles,
+                            fixedOn: api.frameName
+                        }, bind //回执方法
+                );
+            } else {
+                api.hideProgress();
+                ajax_errCode(err); // 解析出错代码
+            }
+        });
+    }
+
+    var bind = function (ret, err) {
+        if (ret) {
+            if (ret.eventType == 'clickContent') { //点击了查看内容，进行跳转
+                UIListView.getDataByIndex({
+                    index: ret.index
+                }, function (ret, err) {
+                    if (ret) {
+                        api.openWin({
+                            name: 'DailyAttendanceDetail_win',
+                            url: 'DailyAttendanceDetail_win.html',
+                            rect: {
+                                x: 0,
+                                y: 0,
+                                w: api.winWidth,
+                                h: api.winHeight
+                            },
+                            pageParam: {
+                                BDate: ret.data['title'].substr(0,10),  //确定匹配的日期，注意去除掉"(星期几)"几个字
+                                Badge: localStorage.getItem('badge')
+                            },
+                            bgColor: 'rgba(0,0,0,0)'
+                        });
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+            }
+            api.hideProgress();
+        } else {
+            api.hideProgress();
+            alert(JSON.stringify(err));
+        }
+    }
+
+</script>
+</html>

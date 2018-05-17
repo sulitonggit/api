@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+    <link rel='stylesheet' href='../css/github.css'>
+    <script type="text/javascript" src="../script/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+    var testreadonly=Boolean(0);
+		tinymce.init({
+			'selector':'textarea',
+			'toolbar':false,
+			'statusbar':false,
+			'menubar':false,
+			'readonly':true === testreadonly,
+			'height':150
+			});
+    </script>
+    
+    <style>
+	body {font: 14px/21px "Lucida Sans","Lucida Grande", "Lucida Sans Unicode", sans-serif;}
+        .PersonSelector
+        {
+            background: #00FF00 ;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .PersonSelector:active
+        {
+            background: #7F0000 ;
+            background-size: 1px 100%;
+        }
+    </style>
+</head>
+<body>
+	<div class="container-fluid">
+	<div >发送邮件</div>
+    	<div class='row'>
+			<div class='col-xs-12'>
+				<div class='input-group'><span class='input-group-addon'>寄往</span>
+					<input type='text' class='form-control' placeholder='收件人地址ddd' id='formid'  value='' enable/>
+					<span class='input-group-addon PersonSelector' onclick='PersonlSelectortest("ss")'>选择</span>
+					<input type='hidden'  id='formidCode'  value='cscscscs'/>
+				</div>
+			</div>
+			<div class='col-xs-12'>
+				<div class='input-group'><span class='input-group-addon'>寄往</span>
+				<input type='datetime-local' id='formidtest' value='2016-01-01' enable/>
+				</div>
+			</div>
+			<div class='col-xs-12'>
+				<div class='input-group'><span class='input-group-addon'>寄往寄往</span>
+				<textarea id='textarea1' rows="5" value='ss'>123</textarea>
+				</div>
+			</div>
+			<div class='col-xs-12'>
+				<pre><code class='javascript hljs'>测试测试测试测试测</code></pre>
+			</div>
+			<div class='row'>
+				<div class='col-xs-12'><h4>测试</h4> </div>
+				<div class='row'> </div>
+				<div class='row'> </div>
+			</div>
+			<div class='col-xs-12'>
+	            <div class="btn-group btn-group-justified">
+	                <div class="btn-group">
+	                    <button tapmode="" type="button" class="btn btn-primary" onclick="deleteitem()">删除测试</button>
+	                </div>  
+					<div class="btn-group">
+	                    <button tapmode="" type="button" class="btn btn-info" onclick="deleteitem()">按钮测试</button>
+	                </div>      
+	            </div>
+			</div>
+			<div class='col-xs-12'>
+	            <div class="btn-group btn-group-justified">
+	                <div class="btn-group">
+	                    <button tapmode="" type="button" class="btn btn-info" onclick="getfile()">按钮测试22</button>
+	                </div>        
+	            </div>
+			</div>			
+    	</div>
+    </div>
+
+    <form class="contact_form" action="" method="post" name="contact_form">
+    
+	</form>
+	<div id="myMessage">
+
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+	var UIListView;
+	var downloadManager;
+	
+	function PersonlSelectortest()
+	{
+		var username="sailunjinyu\fangdl"
+		alert(username.replace('\\','f'))
+	}
+	
+	function deleteitem()
+	{
+		
+		//alert($api.byId("textarea1").value);
+		alert(document.getElementById("textarea1").value);
+	}
+	function getfile()
+	{
+		var htmlPath = window.location.pathname;
+		var uzHtmlPath = htmlPath.replace(api.wgtRootDir, "widget:/");
+		if("ios" != api.systemType)
+		{ // 安卓暂需要特殊处理.
+            uzHtmlPath = "file://" + htmlPath;
+            /* widget包可能在apk中 */
+            uzHtmlPath = uzHtmlPath.replace("file:///android_asset/widget", "widget:/");
+		}
+	
+		var uzJsonPath = uzHtmlPath.replace(/\.html/, ".json");
+	
+		alert(uzJsonPath);	
+
+        setTimeout(function()
+        {
+            /* 使用读文件操作来读 JSON 文件 */
+            api.readFile({
+                path: 'widget://html/test.json'
+            }, function(ret, err)
+            {
+                if(ret.status)
+                {
+                    var jsonObj = JSON.parse(ret.data);
+					alert("11");
+                }
+                else
+                {
+                	alert(JSON.stringify( err ));
+                }
+            });
+        }, 500);
+                            		
+/*		api.readFile({
+	        path:jsonPath
+        },function(ret,err)
+        {
+        	//coding...
+			if(ret.status)
+			{
+				var jsonObj = JSON.parse(ret.data);
+			}
+			else
+			{
+				alert( JSON.stringify( err ) );
+			}
+        });*/
+	};
+	function getJSON(jsonPath, callback)
+    {
+        /* 优先使用平台本身的方法,以兼容安卓. */
+        var intervalId = setInterval(function()
+		{
+			if("undefined" !== typeof(api))
+			{
+				clearInterval(intervalId);
+				clearTimeout(timoutId);
+
+				var uzJsonPath = (function()
+				{
+					var htmlPath = window.location.pathname; // 网页文件的真实路径.
+					var uzHtmlPath = htmlPath.replace(api.wgtRootDir, "widget:/");
+
+					if("ios" != api.systemType)
+					{ // 安卓暂需要特殊处理.
+						uzHtmlPath = "file://" + htmlPath;
+						/* widget包可能在apk中 */
+						uzHtmlPath = uzHtmlPath.replace("file:///android_asset/widget", "widget:/");
+					}
+
+					var uzJsonPath = uzHtmlPath.replace(/\.html/, ".json");
+
+					return uzJsonPath;
+				})();
+				
+				/* 一个必要的延迟: api对象存在,并不一定准备完成. */
+				setTimeout(function()
+				{
+					/* 使用读文件操作来读 JSON 文件 */
+					api.readFile(
+					{
+						path: uzJsonPath
+					}, function(ret, err)
+					{
+						if(ret.status)
+						{
+							var jsonObj = JSON.parse(ret.data);
+							/* 把 JSON对象 回调出去. */
+							if("function" === typeof(callback))
+							{
+								callback(jsonObj);
+							}
+
+						}
+					});
+				}, 500);
+
+			}
+		}, 100);
+
+        /* 2秒之内,平台如果无法准备完成,就当是在桌面预览吧.*/
+        var timoutId = setTimeout(function()
+        {
+            clearInterval(intervalId);
+
+            /* 桌面测试时,需特殊处理json文件的路径,以保证最新. */
+            jsonPath += "?" + new Date();
+
+            $.getJSON(jsonPath, callback);
+        }, 2000);
+	}
+				
+	apiready = function()
+	{
+
+		var pieChart = api.require('pieChart');
+		pieChart.open({
+		    x: api.frameWidth / 2,
+		    y: api.frameHeight / 2,
+		    radius: 100,
+		    center: {
+		        title: '标题',
+		        subTitle: '子标题'
+		    },
+		    elements: [{
+		        value: 10,
+		        color: '#FF6600'
+		    }, {
+		        value: 15,
+		        color: '#660099'
+		    }, {
+		        value: 15,
+		        color: '#FF33FF'
+		    }, {
+		        value: 15,
+		        color: '#66CCFF'
+		    }, {
+		        value: 15,
+		        color: '#00CCFF'
+		    }],
+		    fixedOn: api.frameName,
+		    fixed: false
+		}, function(ret, err) {
+		    if (ret) {
+		        alert(JSON.stringify(ret));
+		    } else {
+		        alert(JSON.stringify(err));
+		    }
+		});
+	};
+   
+
+	window.onload = function() 
+	{
+	
+/*		var inputStr = "<div> <span>流程号:</span><input type='text' placeholder='流程号:' class='input'/></div>"
+		//var demoBlockStr = "<div><div class='page-header'><h2>" + title + subTitle + "</h2></div>";
+			
+		
+		document.getElementById ("myMessage").innerHTML = inputStr;
+		
+			
+			var username ='sailunjinyu\\fangdl';
+			var findstr="常规";
+			//var SRurl ='http://192.168.0.48/eipmobile/ashx/workflow.ashx?k=SearchResult&ADAccount='+username+'&FindStr='+findstr;
+		
+			$.ajax({
+				 type: "POST",
+				 //dataType: 'json',
+				 //crossDomain: true,
+				 url: "http://192.168.31.205/eipmobile/ashx/workflow.ashx",
+				 data: { k: 'SearchResult', ADAccount: username, FindStr:findstr },
+						//beforeSend: function() { $("#ds").html("loading"); },
+						success: function(msg) 
+						{ 
+							alert(msg);
+						}
+					});*/
+	};
+</script>
+</html>

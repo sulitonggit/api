@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+       body,html{
+            background: #FFF;
+        }
+        #header{
+            text-align: center; 
+            background-color: #0647A3; 
+            color: #fff;
+            width: 100%;
+        }
+        .h1 {height: 1px;margin-left: 15px;background: #f0f0f0;}
+        .item {height: 30px;line-height: 30px;padding-left: 15px;background-color: #fff;}        
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="header" class="header">
+           <div class="btn back" onclick="api.closeWin()"></div>
+            <div class="title">版本信息</div>
+            <div class="btn"></div>              
+        </div>
+    </div>	
+
+    <table>
+        <tr>
+            <td>设备版本信息：</td><td id="deviceInfo"></td>
+        </tr>
+        <tr>
+            <td>软件当前版本：</td><td id="appCurrentInfo"></td>
+        </tr>      
+    </table>
+</body>
+<script type="text/javascript">
+	
+	apiready = function(){
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+        var headerH = $api.offset(header).h;
+		var footerH = 0;
+		var frameH = api.winHeight - headerH - footerH;
+		
+		api.showProgress({});
+		$api.text($api.byId('deviceInfo'), api.systemType + "(" + api.systemVersion + ")");
+		$api.text($api.byId('appCurrentInfo'), api.appVersion);
+		
+		api.hideProgress();	
+	};
+	
+</script>
+</html>

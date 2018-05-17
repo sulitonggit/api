@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>每日考勤详情</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 10px">
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-bordered table-condensed hidden">
+                <tr>
+                    <td>刷卡开始</td>
+                    <td id="CardBeginTime"></td>
+                </tr>
+                <tr>
+                    <td>刷卡结束</td>
+                    <td id="CardEndTime"></td>
+                </tr>
+                <tr>
+                    <td>考勤状态</td>
+                    <td id="LeaveStatus"></td>
+                </tr>
+                <tr>
+                    <td>轮班班组</td>
+                    <td id="GroupID"></td>
+                </tr>
+                <tr>
+                    <td>班次</td>
+                    <td id="Shift"></td>
+                </tr>
+                <tr>
+                    <td>异常</td>
+                    <td id="IsException"></td>
+                </tr>
+                <tr>
+                    <td>应工作时数</td>
+                    <td id="PNHR"></td>
+                </tr>
+                <tr>
+                    <td>应工作天数</td>
+                    <td id="PNDY"></td>
+                </tr>
+                <tr>
+                    <td>工作时数</td>
+                    <td id="WKHR"></td>
+                </tr>
+                <tr>
+                    <td>实际出勤</td>
+                    <td id="WKDY"></td>
+                </tr>
+                <tr>
+                    <td>迟到分钟</td>
+                    <td id="LIMN"></td>
+                </tr>
+                <tr>
+                    <td>早退分钟</td>
+                    <td id="EOMN"></td>
+                </tr>
+                <tr>
+                    <td>缺勤时数</td>
+                    <td id="ABHR"></td>
+                </tr>
+                <tr>
+                    <td>旷工天数</td>
+                    <td id="UAHR"></td>
+                </tr>
+                <tr>
+                    <td>加班缺勤</td>
+                    <td id="OTAB"></td>
+                </tr>
+                <tr>
+                    <td>出差加班(H)</td>
+                    <td id="OT1"></td>
+                </tr>
+                <tr>
+                    <td>双休日加班(H)</td>
+                    <td id="OT2"></td>
+                </tr>
+                <tr>
+                    <td>节假日加班(H)</td>
+                    <td id="OT3"></td>
+                </tr>
+                <tr>
+                    <td>转调加班(H)</td>
+                    <td id="CLOT"></td>
+                </tr>
+                <tr>
+                    <td>病假</td>
+                    <td id="SicL"></td>
+                </tr>
+                <tr>
+                    <td>事假</td>
+                    <td id="PerL"></td>
+                </tr>
+                <tr>
+                    <td>年假</td>
+                    <td id="AnnL"></td>
+                </tr>
+                <tr>
+                    <td>丧假</td>
+                    <td id="ComL"></td>
+                </tr>
+                <tr>
+                    <td>婚假</td>
+                    <td id="MarL"></td>
+                </tr>
+                <tr>
+                    <td>产检假</td>
+                    <td id="PrPL"></td>
+                </tr>
+                <tr>
+                    <td>产假</td>
+                    <td id="MatL"></td>
+                </tr>
+                <tr>
+                    <td>陪产假</td>
+                    <td id="PatL"></td>
+                </tr>
+                <tr>
+                    <td>调休</td>
+                    <td id="OTCL"></td>
+                </tr>
+                <tr>
+                    <td>哺乳假</td>
+                    <td id="NurL"></td>
+                </tr>
+                <tr>
+                    <td>工伤假</td>
+                    <td id="ISJL"></td>
+                </tr>
+                <tr>
+                    <td>出差</td>
+                    <td id="FANF"></td>
+                </tr>
+                <tr>
+                    <td>公司放假</td>
+                    <td id="OfAL"></td>
+                </tr>
+                <tr>
+                    <td>请假出勤</td>
+                    <td id="LVWK"></td>
+                </tr>
+                <tr>
+                    <td>哺乳假天数</td>
+                    <td id="NUDY"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../script/api.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var serverUrl="https://smartforms.sailunjinyu.com/eipmobile/Attendance.ashx";
+	
+    apiready = function () {
+        //TODO 进行数据读取加载
+        api.showProgress();
+        api.ajax({
+            url: serverUrl,
+            method: 'post',
+            data: {
+                values: {
+                    k: 'DailyAttendanceDetail',
+                    BDate: api.pageParam.BDate, //数据库的匹配条件之一
+                    ADAccount: localStorage.getItem('username'),
+                    Badge: localStorage.getItem('badge'), //TODO 需要更改 //数据库的匹配条件之一
+                    Type: '2', //说明执行数据库存储过程的每日查询
+                    FindStr: ''
+                }
+            }
+        }, function (ret, err) {
+            if (ret) {
+                //进行表格绑定
+                bind2Table(ret);
+            } else {
+                ajax_errCode(err); // 解析出错代码
+            }
+            api.hideProgress();
+        });
+
+        function bind2Table(ret){
+            for(i in ret[0]){
+                var temp = document.getElementById(i);
+                temp?temp.innerText = ret[0][i]:'';                
+            }
+            $api.removeCls($api.dom('table'), 'hidden');
+        }
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.closeWin({
+                name: 'DailyAttendanceDetail_win'
+            });
+        });
+    }
+</script>
+</html>

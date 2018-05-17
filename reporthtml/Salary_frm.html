@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>每月薪资</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+        .padding-5 {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        form {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <form action="" class="form-inline">
+                    <div class="form-group col-xs-8 padding-5">
+                        <input type="text" class="form-control" name="start_date" readonly placeholder="查询月份">
+                    </div>
+
+                    <div class="form-group col-xs-2 padding-5">
+                        <button class="btn btn-primary">查询</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-12" id="salary">
+
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    var y; // 用来设置UIListView距离上边的高度
+    var serverUrl = "https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+
+    $(document).ready(function() {
+        y = $('.container').outerHeight();
+        //初次加载时查询的上个月的
+        var obj_date = new Date();
+        if (obj_date.getMonth() < 1) { //说明当前月份是一月份，上个月份则是去年的12月份
+            $("input[name = 'start_date']").val(obj_date.getFullYear() - 1 + "-" + 12);
+        } else {
+            $("input[name = 'start_date']").val(obj_date.getFullYear() + "-" + (obj_date.getMonth()));
+        }
+    });
+
+    apiready = function() {
+        //监听输入框点击
+        $('input').click(function() {
+            var _this = $(this);
+
+            //月份设定
+            api.openPicker({
+                type: 'date',
+                //date: date_now, //2016/10/27 默认是当前时间
+                title: '选择日期'
+            }, function(ret, err) {
+                if (ret) {
+                    var date = ret.year + '-' + ret.month;
+                    _this.val(date);
+                } else {
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+
+        //监听查询按钮点击
+        $('.btn.btn-primary').click(function() {
+
+            //进行日期检查:空、大小
+            var start_date_val = $('input[name="start_date"]').val().trim();
+
+            if (start_date_val == '') {
+                alert('请设置起始日期');
+                return false;
+            }
+            var start_date = Date.parse(start_date_val.replace(/-/g, "/"));
+
+            //发送请求，获取数据
+            api.showProgress();
+            $.ajax({
+                url: serverUrl,
+                method: 'post',
+                dataType: 'text',
+                data: {
+                    k: 'GetSalary',
+                    badge: localStorage.getItem('badge'),
+                    term: start_date_val + '-1'
+                },
+                success: function(data) {
+                    $('#salary').html(data);
+                },
+                error: function() {
+                    alert('请求出错');
+                },
+                complete: function() {
+                    api.hideProgress();
+                }
+            });
+            //屏蔽表单提交默认动作
+            return false;
+        });
+    };
+</script>
+
+</html>

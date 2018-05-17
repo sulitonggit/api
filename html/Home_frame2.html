@@ -1,0 +1,243 @@
+<!DOCTYPE html>	
+<html>	
+<head>	
+  <meta charset="utf-8">	
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>	
+  <title>frame</title>	
+  <link rel="shortcut icon" href="/favicon.ico">	
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">	
+  <link rel="stylesheet" type="text/css" href="../css/api.css" />	
+	<style>	
+		html {width: 100%;height: 100%;background: #FFF;}	
+		body {background: #FFFFFF;width: 100%;/*height: 100%;*/}	
+		.recommand_card {
+			box-sizing:border-box;
+			-webkit-box-sizing:border-box;
+			float: left;
+			width: 33%;
+			padding-left: 5px;
+			padding-right: 5px;
+			text-align: center;
+			font-size: 12px;
+			margin-bottom: 10px;
+		}	
+		.recommand_card img {width: 100%;}	
+		.subtitle {
+			padding-left: 5px; 
+			padding-bottom: 5px;
+			font-size: 14px; 
+			font-weight: bold;
+			background:#0883D9;
+			height:50px; 
+			border-bottom: 0px solid #0883D9;
+			box-sizing:border-box;
+			-webkit-box-sizing:border-box;
+			margin-bottom: 10px;
+			margin-left: 5px;
+			margin-right: 5px;
+			
+		}
+		#mydolist {padding: 0px 0 0 0px;height: 50px;}
+		.right_btn{
+			float: right;
+			padding: 11px 15px 11px 15px;
+			height: 28px;
+		}
+		.WFMyDoListNumshow{
+			float:right;
+			color:#FFFFFF;
+			margin-right: 50px;
+			margin-top: 15px;
+		}
+		.divider {height: 10px;clear: both;}	
+		.innerCard {background: #fff;}	
+		.videotitle {
+			padding-bottom: 4px;
+			padding-left: 5px;
+		}	
+		.tvshow_row {height: 137px;}	
+		.tvshow_row .innerCard{text-align: left;position: relative;}	
+		.videosubtitle {font-size: 10px; color: #909090;padding-left: 5px;padding-bottom: 5px;}	
+		.update {position: absolute; bottom: 45px; margin-left: 5px; color: #fff;}	
+		.card_hover {background: #0f0;}	
+		/* 图片轮播样式 */	
+		.pagination {position: absolute; z-index: 20; right: 10px; bottom: 10px; }	
+		.swiper-pagination-switch {display: inline-block; width: 8px; height: 8px; border-radius: 8px; background: #555; margin-right: 5px; opacity: 0.8; border: 1px solid #fff; cursor: pointer; }	
+		.swiper-active-switch {background: #fff; }	
+	
+	
+		.swipe {	
+			width: 100%;	
+	        background-color: #0883D9;	
+	        overflow: hidden;	
+	        position: relative;	
+	        padding-bottom: 0px;
+	    }	
+	    .swipe-wrap {	
+	        overflow: hidden;	
+	        position: relative;	
+	        padding-top: 0px;
+	    }	
+	    .swipe-wrap .swipe-box {
+	        float: left;	
+	        width: 100%;	
+	        position: relative;	
+	    }	
+		.swipe-box img{	
+			width:100%;	
+		}	
+		.swipe .title-box {	
+			width:100%;	
+			position: relative;	
+		}
+  		
+	</style>	
+</head>	
+<body>	
+	<div id="swipe" class="swipe">	
+		<div class="swipe-wrap">	
+			<div class="swipe-box"> 	
+				<!--<img src="../image/api_2new.png" alt="">-->
+			</div>	
+		</div>	
+	</div>
+	<div class="divider"></div>	
+	<ul class="recommand_row">	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenGroupDocument()">	
+			<div class="innerCard">	
+				<img src="../image/GroupDocument.png" alt="">	
+			</div>	
+		</li>
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenGroupNotice()">	
+			<div class="innerCard">	
+				<img src="../image/GroupNotice.png" alt="">	
+			</div>	
+		</li>
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenGroupSystem()">	
+			<div class="innerCard">	
+				<img src="../image/GroupSystem.png" alt="">	
+			</div>	
+		</li>
+
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenSubsidiaryDocument()">	
+			<div class="innerCard">	
+				<img src="../image/SubsidiaryDocument.png" alt="">	
+			</div>	
+		</li>
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenSubsidiaryNotice()">	
+			<div class="innerCard">	
+				<img src="../image/SubsidiaryNotice.png" alt="">	
+			</div>	
+		</li>
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenCentralNotice()">	
+			<div class="innerCard">	
+				<img src="../image/CentralNotice.png" alt="">	
+			</div>	
+		</li>
+	</ul>	
+
+</body>	
+<script type="text/javascript" src="../script/api.js"></script>	
+<script type="text/javascript" src="../script/swipe.js"></script>	
+<script>
+	var username=localStorage.getItem('username');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	var MyDoListNum=[];
+	var alias=localStorage.getItem('alias').toUpperCase();
+	
+	apiready = function ()
+	{
+		api.setRefreshHeaderInfo(
+		{	
+			visible: true,	
+			bgColor: 'rgba(0,0,0,0)',	
+			textColor: '#666',	
+			textDown: '下拉刷新',	
+			textUp: '释放刷新'		
+		}, function(ret, err)
+		{
+			//获取各待办数据
+/*			api.showProgress({});
+			
+			api.ajax({
+				url:serverurl,
+		        method: 'post',
+		        dataType:'json',
+				data: {values:{k:'GetMyDoListNum',username:username}}
+	        },function(ret,err)
+	        {
+				if (ret)
+				{
+					for(var idx in ret)
+					{
+						//MyDoListNum[idx] = ret[idx];
+						if(ret[idx].ModuleName=='TaskMyDoList')
+						{
+							document.getElementById ("TaskMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办任务';
+						}						
+		            }
+		            
+					///隐藏加载
+					api.hideProgress();	
+				}
+				else
+	        	{
+	         		api.alert({msg:JSON.stringify(err)});
+	         		api.hideProgress();        	
+	        	}			
+	        });	*/
+		    api.refreshHeaderLoadDone();	
+		});
+	
+	};
+	///集团文件
+	function OpenGroupDocument()
+	{
+		api.openWin({
+	        name: 'GroupDocumentList',
+	        url: 'GroupDocumentList_win.html'
+        });
+	};
+	//集团通知
+	function OpenGroupNotice()
+	{
+		api.openWin({
+	        name: 'GroupNoticeList_win',
+	        url: 'GroupNoticeList_win.html'
+        });
+	};
+	//集团制度
+	function OpenGroupSystem()
+	{
+		api.openWin({
+	        name: 'GroupSystemList_win',
+	        url: 'GroupSystemList_win.html'
+        });
+	};	
+	//子公司文件
+	function OpenSubsidiaryDocument()
+	{
+		api.openWin({
+	        name: 'SubsidiaryDocumentList_win',
+	        url: 'SubsidiaryDocumentList_win.html'
+        });
+	};
+	//子公司通知
+	function OpenSubsidiaryNotice()
+	{
+		api.openWin({
+	        name: 'SubsidiaryNoticeList_win',
+	        url: 'SubsidiaryNoticeList_win.html'
+        });
+	};
+	//中心通知
+	function OpenCentralNotice()
+	{
+		api.openWin({
+	        name: 'CentralNoticeList_win',
+	        url: 'CentralNoticeList_win.html'
+        });
+	};
+
+</script>	
+</html>	

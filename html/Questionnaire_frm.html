@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>问卷</title>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/Vue.min.js"></script>
+    <script type="text/javascript" src="../script/zepto.min.js"></script>
+
+    <style>
+        /*解决数据绑定时的闪屏问题*/
+        [v-cloak] {
+            display: none;
+        }
+
+        ul {
+            list-style: none;
+            padding: 10px;
+            margin-bottom: 0;
+        }
+
+        ul ul {
+            padding-left: 0;
+        }
+
+        ul ul li {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px
+        }
+
+        .btn-primary {
+            color: #fff;
+            background-color: #428bca;
+            border-color: #357ebd;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .loading {
+            width: 100%;
+            height: 300px;
+            background-image: url('../image/loading_more.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        textarea{
+        	border:1px solid black;
+        }
+        
+    </style>
+</head>
+<body>
+<div class="loading"></div>
+<div id="wenjuan" v-cloak>
+    <form>
+        <div v-for="group in data">
+            <p style="text-align: center"><strong>{{group.QuestionType}}</strong></p>
+            <ul>
+                <li v-for="(item, index) in group.items">
+                    <span>{{ index+1 }}.{{ item.Question }}</span>
+                    <!--解决单选 多选 开始-->
+                    <template v-if="item.ColumnType == 'radio' || item.ColumnType == 'checkbox'">
+                        <ul>
+                            <li v-for="choice in item.answers.split('|')">
+                                <label>
+                                    <input :type="item.ColumnType" :name="item.ID" :value="choice.split('-')[0]"/>
+                                    {{choice.substr(choice.lastIndexOf('-')+1)}}
+                                </label>
+                            </li>
+                        </ul>
+                    </template>
+                    <!--解决单选 多选 结束-->
+
+                    <!--解决主观题 开始-->
+                    <template v-if="item.ColumnType == 'textarea'">
+                        <br>
+                        <textarea :name="item.ID" :id="item.ID" cols="35" rows="10">
+                   </textarea>
+                    </template>
+                    <!--解决主观题 结束-->
+                </li>
+            </ul>
+        </div>
+
+        <button type="button" class="btn btn-primary">提交</button>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    var serverurl = 'https://smartforms.sailunjinyu.com/eipmobile/normal.ashx';
+    //var serverurl = 'http://localhost:8010/normal.ashx';
+
+    apiready = function () {
+        api.showProgress({});
+        //加载数据
+        $(document).ready(function () {
+            $.ajax({
+                type: 'GET',
+                url: serverurl,
+                data: {
+                    k: 'GetQuestionnaire',
+                    type: 1,
+                    badge: localStorage.getItem('badge')
+                },
+                dataType: 'json',
+                success: function (data) {
+                    //进行数据绑定
+                    if (data.length == 0) {
+                        api.alert({
+                            title: '没有数据',
+                            msg: '没有您要答的题'
+                        }, function (ret, err) {
+                            api.closeWin();
+                        });
+                    }
+                    var questions = json2json(data);
+                    var wenjuan = new Vue({
+                        el: '#wenjuan',
+                        data: {
+                            data: questions
+                        },
+                        mounted: function () {
+                            $('.loading').hide();
+                        }
+                    });
+                },
+                error: function (xhr, type) {
+                    //alert('Ajax error!');
+                    api.alert({
+                        title: 'Ajax error',
+                        msg: '数据加载失败，点击按钮关闭页面，请稍后重新进入'
+                    }, function (ret, err) {
+                        api.closeWin();
+                    });
+                }
+            });
+        });
+        api.hideProgress();
+    }
+
+    //绑定提交事件
+    $(document).on('click', '.btn', function (e) {
+        //检查是否回答完所有问题
+        /*
+         var status = true;
+         $('ul li ul').each(function (index) {
+         if ($(this).find('input:checked').length < 1) {
+         status = false;
+         //停止遍历
+         return false;
+         }
+         });
+         if (!status) {
+         alert('请检查并回答完所有问题');
+         return false;
+         }
+         */
+
+        //序列化表单内容
+        var form_data = $('form').serialize();
+        form_data = form_data.replace(/%2C/g, "%EF%BC%8C"); //后台中会对checkbox值数组进行去英文逗号","的处理，所以将主观题中的英文逗号换成中文的
+
+        $.ajax({
+            type: 'post',
+            url: serverurl + '?k=PostQuestionnaire&type=1&badge=' + localStorage.getItem('badge'),
+            data: form_data,
+            dataType: 'text',
+            success: function (data) {
+                if (data != 'ok') {
+                    alert('提交问卷失败，请稍后再试'); //后台验证了是否含有badge和deviceId参数，可能非法提交表单
+                    return false;
+                }
+                //关闭页面
+                api.alert({
+                    title: '提交成功',
+                    msg: '点击确定按钮，页面自动关闭'
+                }, function (ret, err) {
+                    api.closeWin();
+                });
+            },
+            error: function (xhr, type) {
+                alert('Ajax error!提交问卷失败，请稍后再试'); //后台验证了是否含有badge和deviceId参数，可能非法提交表单
+                return false;
+            }
+        });
+        //禁止表单提交
+        return false;
+    });
+
+
+    //重新组装一个按照部门分组的json
+    function json2json(data) {
+        var tree = [];
+        $.each(data, function (index, item) {
+            if ($.inArray(item['QuestionType'], tree) < 0) {
+                tree.push(item['QuestionType']);
+            }
+        });
+//console.log(tree);
+
+        var questions = [];
+
+        $.each(tree, function (index, item) {
+            var group = {QuestionType: '', items: []};
+            $.each(data, function (data_index, data_item) {
+                if (item == data_item.QuestionType) {
+                    group.QuestionType ==''? group.QuestionType = data_item.QuestionType : '';
+                    group.items.push(data_item);
+                }
+            });
+            questions.push(group);
+        });
+        //console.log(questions);
+        return questions;
+    }
+</script>
+</body>
+</html>

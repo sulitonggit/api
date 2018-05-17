@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>每月考勤</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../script/jquery-1.12.4.min.js"></script>
+
+    <style>
+        form .form-group {
+            padding-right: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid" style="padding-top: 10px">
+        <div class="row">
+            <div class="col-xs-12">
+                <form action="" class="form-inline">
+                    <div class="form-group col-xs-8 padding-5">
+                        <input type="text" class="form-control" name="end_date" readonly placeholder="月份">
+                    </div>
+                    <div class="form-group col-xs-2 padding-5">
+                        <button class="btn btn-primary" id="search">查询</button>
+                    </div>
+                </form>
+
+                <table class="table table-bordered table-condensed table-striped hidden">
+                    <tr>
+                        <td>月份</td>
+                        <td id="Term"></td>
+                    </tr>
+                    <tr>
+                        <td>应工作天数</td>
+                        <td id="PNDY"></td>
+                    </tr>
+                    <tr>
+                        <td>出勤合计</td>
+                        <td id="WKDY"></td>
+                    </tr>
+                    <tr>
+                        <td>橡胶谷出勤</td>
+                        <td id="XJGWK"></td>
+                    </tr>
+                    <tr>
+                        <td>其他出勤</td>
+                        <td id="OtherWK"></td>
+                    </tr>
+                    <tr>
+                        <td>中班天数</td>
+                        <td id="MSHIF"></td>
+                    </tr>
+                    <tr>
+                        <td>夜班天数</td>
+                        <td id="NSHIF"></td>
+                    </tr>
+                    <tr>
+                        <td>出差</td>
+                        <td id="FANF"></td>
+                    </tr>
+                    <tr>
+                        <td>驻外</td>
+                        <td id="ABRD"></td>
+                    </tr>
+                    <tr>
+                        <td>学习</td>
+                        <td id="TSTL"></td>
+                    </tr>
+
+                    <tr>
+                        <td>请假出勤</td>
+                        <td id="LVWK"></td>
+                    </tr>
+                    <tr>
+                        <td>出差加班(H)</td>
+                        <td id="OT1"></td>
+                    </tr>
+                    <tr>
+                        <td>双休日加班(H)</td>
+                        <td id="OT2"></td>
+                    </tr>
+                    <tr>
+                        <td>节假日加班(H)</td>
+                        <td id="OT3"></td>
+                    </tr>
+                    <tr>
+                        <td>病假</td>
+                        <td id="SicL"></td>
+                    </tr>
+                    <tr>
+                        <td>工伤假</td>
+                        <td id="ISJL"></td>
+                    </tr>
+                    <tr>
+                        <td>事假</td>
+                        <td id="PerL"></td>
+                    </tr>
+                    <tr>
+                        <td>婚假</td>
+                        <td id="MarL"></td>
+                    </tr>
+                    <tr>
+                        <td>产假</td>
+                        <td id="MatL"></td>
+                    </tr>
+                    <tr>
+                        <td>陪产假</td>
+                        <td id="PatL"></td>
+                    </tr>
+                    <tr>
+                        <td>丧假</td>
+                        <td id="ComL"></td>
+                    </tr>
+                    <tr>
+                        <td>年假</td>
+                        <td id="AnnL"></td>
+                    </tr>
+                    <tr>
+                        <td>哺乳假</td>
+                        <td id="NurL"></td>
+                    </tr>
+                    <tr>
+                        <td>计划生育假</td>
+                        <td id="FePL"></td>
+                    </tr>
+                    <tr>
+                        <td>迟到分钟</td>
+                        <td id="LIMN"></td>
+                    </tr>
+                    <tr>
+                        <td>旷工天数</td>
+                        <td id="UAHR"></td>
+                    </tr>
+                    <tr>
+                        <td>休班</td>
+                        <td id="OffDuty"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var serverUrl = "https://smartforms.sailunjinyu.com/eipmobile/Attendance.ashx";
+
+    $(document).ready(function() {
+        //初次加载时查询的上个月的
+        var obj_date = new Date();
+        if (obj_date.getMonth() < 1) { //说明当前月份是一月份，上个月份则是去年的12月份
+            $("input[name = 'end_date']").val(obj_date.getFullYear() - 1 + "-" + 12);
+        } else {
+            $("input[name = 'end_date']").val(obj_date.getFullYear() + "-" + (obj_date.getMonth()));
+        }
+
+        //监听输入框点击
+        $('input').click(function() {
+            var _this = $(this);
+
+            api.openPicker({
+                type: 'date',
+                //date: date_now, //2016/10/27 默认是当前时间
+                title: '选择月份'
+            }, function(ret, err) {
+                if (ret) {
+                    var date = ret.year + '-' + ret.month; //+ '/' + ret.day;
+                    _this.val(date);
+                } else {
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+
+
+        $("#search").click(function() {
+            var month = $('input').val();
+            if (!month) {
+                alert('请设置好月份');
+                return false;
+            }
+            /*
+            var func_js = 'bindData("' + month + '-01")';
+            api.execScript({
+                frameName: 'MonthlyAttendance_frm',
+                script:func_js
+            });
+            */
+
+            bindData(month + '-01');
+            //屏蔽表单提交默认动作
+            return false;
+        });
+    });
+
+
+    apiready = function() {
+
+        //加载数据
+        bindData();
+
+        //监听按键回退事件
+        api.addEventListener({
+            name: 'keyback'
+        }, function(ret, err) {
+            api.closeWin();
+        });
+    };
+
+    // 加载数据
+    function bindData(month) {
+        api.showProgress();
+        if (month) { //二次绑定
+            $('td[id]').text('');
+        } else {
+            month = '';
+        }
+        api.ajax({
+            url: serverUrl,
+            method: 'post',
+            data: {
+                values: {
+                    k: 'MonthlyAttendance',
+                    Month: month,
+                    //ADAccount: localStorage.getItem('username'),
+                    Badge: localStorage.getItem('badge') //TODO 工号需要修改
+                }
+            }
+        }, function(ret, err) {
+            if (ret) {
+                bind2Table(ret);
+            } else {
+                ajax_errCode(err); // 解析出错代码
+            }
+            api.hideProgress();
+        });
+    }
+
+    function bind2Table(ret) {
+        if (ret.length == 0) {
+            api.hideProgress();
+            alert($("input[name = 'end_date']").val() + '月份数据可能未汇总，请选择其他月份');
+            return false;
+        } else {
+            for (i in ret[0]) {
+                var temp = document.getElementById(i);
+                temp ? temp.innerText = ret[0][i] : '';
+            }
+            $api.removeCls($api.dom('table'), 'hidden');
+        }
+    }
+</script>
+
+</html>

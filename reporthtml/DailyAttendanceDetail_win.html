@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+    <style>
+	    #header{
+	        text-align: center; 
+			background-color: #0883D9;
+			color: #fff;
+	        width: 100%;
+	    }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+	    <div id="header" class="header">
+	        <div class="btn back" onclick="api.closeWin()"></div>
+	        <div class="title">日出勤详情</div>
+	        <div class="btn"></div>
+	    </div>
+    </div>	
+</body>
+<script type="text/javascript">
+
+
+	apiready = function()
+	{       
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+        var headerH = $api.offset(header).h;
+		var footerH = 0;
+		var frameH = api.winHeight - headerH - footerH;
+
+		api.openFrame({
+	        name: 'DailyAttendanceDetail_frm',
+	        url: 'DailyAttendanceDetail_frm.html',
+	        rect: {
+		        x:0,
+		        y:headerH,
+		        w:'auto',
+		        h:frameH
+	        },
+            pageParam:{
+                BDate : api.pageParam.BDate,
+                Badge:localStorage.getItem('badge')
+            }
+        });
+        
+
+        api.addEventListener({
+	        name:'keyback'
+        },function(ret,err){
+        	api.closeWin();
+        });
+	};
+</script>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div id='form' class="container-fluid">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var username=localStorage.getItem('username');
+	var FormID="";
+	var ActivityName="";
+	var NodeName="";
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/workflow.ashx";
+	var inputGroupStr="";
+
+	apiready = function()
+	{
+		FormID=api.pageParam.FormID;
+		ActivityName=api.pageParam.ActivityName;
+		NodeName=api.pageParam.NodeName;
+        //显示加载动画
+		api.showProgress({});
+		//获取流程节点数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'text',
+			data: {values:{k:'CreateMoblieNodeShowTable',ADAccount:username,FormID:FormID,NodeName:NodeName,ActivityName:ActivityName}}
+	        
+        },function(ret,err)
+        {
+        	if (ret)
+        	{
+        		//NodeNamelist=ret
+        		//alert(FormID);
+        		//alert(NodeName);
+        		//api.alert({msg:JSON.stringify(ret)});
+        		document.getElementById ("form").innerHTML = ret;
+        		api.hideProgress();
+        	}
+        	else
+        	{
+        		api.alert({msg:JSON.stringify(err)});
+        		api.hideProgress();
+        	}
+        });
+	};
+
+</script>
+</html>

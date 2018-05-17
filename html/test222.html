@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<title>title</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css" />
+		<link rel="stylesheet" type="text/css" href="../script/bootstrap/css/bootstrap.min.css" />
+		<script type="text/javascript" src="../script/bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+//			var testreadonly = Boolean(0);
+//			tinymce.init({
+//				'selector': 'textarea',
+//				'toolbar': false,
+//				'statusbar': false,
+//				'menubar': false,
+//				'readonly': true === testreadonly,
+//				'height': 150
+//			});
+		</script>
+
+		<style>
+			body {
+				font: 14px/21px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+			}
+			
+			.PersonSelector {
+				background: #00FF00;
+				background-size: 1px 100%;
+				position: relative;
+				z-index: 1;
+			}
+			
+			.PersonSelector:active {
+				background: #7F0000;
+				background-size: 1px 100%;
+			}
+			
+			.col-xs-12 {
+				margin: 5px 0px 5px 0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container-fluid1">
+			<center>
+				<h2>外部合作单位招待登记表</h2>
+			</center>
+			<div class='container'>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*登记人</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>所属单位</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>所在部门</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>岗位</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*招待日期</span>
+						<input type='datetime-local' class="form-control" id='formidtest' value='2016-01-01' enable/>
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*接受招待批准人</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*接待单位类型</span>
+						<select id="userdomain" name="userdomain" class="form-control">
+							<option value="SAILUNJINYU">SAILUNJINYU</option>
+							<option value="JINYUTYRES">JINYUTYRES</option>
+							<option value="JINYUTIRES">JINYUTIRES</option>
+							<option value="SAILUNTYRE">SAILUNTYRE</option>
+							<option value="SVTYRE">SVTYRE</option>
+							<option value="PEACEDOVETYRE">PEACEDOVETYRE</option>
+							<option value="SAILUNGROUP">SAILUNGROUP</option>
+						</select>
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*接待单位名称</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>主接待人姓名</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>部门</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>职务</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*合作事项说明</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*接待方式</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+						<span class='input-group-addon PersonSelector' onclick='PersonlSelectortest("ss")'>选择</span>
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+					<div class='input-group'><span class='input-group-addon'>*接待地点</span>
+						<input type='text' class='form-control' placeholder='' id='formid' value='' enable/>
+
+						<input type='hidden' id='formidCode' value='cscscscs' />
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+					<div class='input-group'><span class='input-group-addon'>*我方参加人员<br>（按主次顺序）<s class='input-group-addon PersonSelector' onclick='PersonlSelectortest("ss")'>选择</s></span>
+						<textarea id='textarea1' class="form-control" rows="5" value='ss'>123</textarea>
+					</div>
+				</div>
+				<div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+					<button tapmode="" type="button" class="btn btn-info btn-block" onclick="getfile()">保存</button>
+
+				</div>
+			</div>
+		</div>
+
+		<form class="contact_form" action="" method="post" name="contact_form">
+
+		</form>
+		<div id="myMessage">
+
+		</div>
+	</body>
+	<script type="text/javascript" src="../script/api1.js"></script>
+	<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+		var UIListView;
+		var downloadManager;
+
+		function PersonlSelectortest() {
+			var username = "sailunjinyu\fangdl"
+			alert(username.replace('\\', 'f'))
+		}
+
+		function deleteitem() {
+
+			//alert($api.byId("textarea1").value);
+			alert(document.getElementById("textarea1").value);
+		}
+
+		function getfile() {
+			var htmlPath = window.location.pathname;
+			var uzHtmlPath = htmlPath.replace(api.wgtRootDir, "widget:/");
+			if("ios" != api.systemType) { // 安卓暂需要特殊处理.
+				uzHtmlPath = "file://" + htmlPath;
+				/* widget包可能在apk中 */
+				uzHtmlPath = uzHtmlPath.replace("file:///android_asset/widget", "widget:/");
+			}
+
+			var uzJsonPath = uzHtmlPath.replace(/\.html/, ".json");
+
+			alert(uzJsonPath);
+
+			setTimeout(function() {
+				/* 使用读文件操作来读 JSON 文件 */
+				api.readFile({
+					path: 'widget://html/test.json'
+				}, function(ret, err) {
+					if(ret.status) {
+						var jsonObj = JSON.parse(ret.data);
+						alert("11");
+					} else {
+						alert(JSON.stringify(err));
+					}
+				});
+			}, 500);
+
+			/*		api.readFile({
+				        path:jsonPath
+			        },function(ret,err)
+			        {
+			        	//coding...
+						if(ret.status)
+						{
+							var jsonObj = JSON.parse(ret.data);
+						}
+						else
+						{
+							alert( JSON.stringify( err ) );
+						}
+			        });*/
+		};
+
+		function getJSON(jsonPath, callback) {
+			/* 优先使用平台本身的方法,以兼容安卓. */
+			var intervalId = setInterval(function() {
+				if("undefined" !== typeof(api)) {
+					clearInterval(intervalId);
+					clearTimeout(timoutId);
+
+					var uzJsonPath = (function() {
+						var htmlPath = window.location.pathname; // 网页文件的真实路径.
+						var uzHtmlPath = htmlPath.replace(api.wgtRootDir, "widget:/");
+
+						if("ios" != api.systemType) { // 安卓暂需要特殊处理.
+							uzHtmlPath = "file://" + htmlPath;
+							/* widget包可能在apk中 */
+							uzHtmlPath = uzHtmlPath.replace("file:///android_asset/widget", "widget:/");
+						}
+
+						var uzJsonPath = uzHtmlPath.replace(/\.html/, ".json");
+
+						return uzJsonPath;
+					})();
+
+					/* 一个必要的延迟: api对象存在,并不一定准备完成. */
+					setTimeout(function() {
+						/* 使用读文件操作来读 JSON 文件 */
+						api.readFile({
+							path: uzJsonPath
+						}, function(ret, err) {
+							if(ret.status) {
+								var jsonObj = JSON.parse(ret.data);
+								/* 把 JSON对象 回调出去. */
+								if("function" === typeof(callback)) {
+									callback(jsonObj);
+								}
+
+							}
+						});
+					}, 500);
+
+				}
+			}, 100);
+
+			/* 2秒之内,平台如果无法准备完成,就当是在桌面预览吧.*/
+			var timoutId = setTimeout(function() {
+				clearInterval(intervalId);
+
+				/* 桌面测试时,需特殊处理json文件的路径,以保证最新. */
+				jsonPath += "?" + new Date();
+
+				$.getJSON(jsonPath, callback);
+			}, 2000);
+		}
+
+		apiready = function() {
+
+			var pieChart = api.require('pieChart');
+			pieChart.open({
+				x: api.frameWidth / 2,
+				y: api.frameHeight / 2,
+				radius: 100,
+				center: {
+					title: '标题',
+					subTitle: '子标题'
+				},
+				elements: [{
+					value: 10,
+					color: '#FF6600'
+				}, {
+					value: 15,
+					color: '#660099'
+				}, {
+					value: 15,
+					color: '#FF33FF'
+				}, {
+					value: 15,
+					color: '#66CCFF'
+				}, {
+					value: 15,
+					color: '#00CCFF'
+				}],
+				fixedOn: api.frameName,
+				fixed: false
+			}, function(ret, err) {
+				if(ret) {
+					alert(JSON.stringify(ret));
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		};
+
+		window.onload = function() {
+
+			/*		var inputStr = "<div> <span>流程号:</span><input type='text' placeholder='流程号:' class='input'/></div>"
+					//var demoBlockStr = "<div><div class='page-header'><h2>" + title + subTitle + "</h2></div>";
+						
+					
+					document.getElementById ("myMessage").innerHTML = inputStr;
+					
+						
+						var username ='sailunjinyu\\fangdl';
+						var findstr="常规";
+						//var SRurl ='http://192.168.0.48/eipmobile/ashx/workflow.ashx?k=SearchResult&ADAccount='+username+'&FindStr='+findstr;
+					
+						$.ajax({
+							 type: "POST",
+							 //dataType: 'json',
+							 //crossDomain: true,
+							 url: "http://192.168.31.205/eipmobile/ashx/workflow.ashx",
+							 data: { k: 'SearchResult', ADAccount: username, FindStr:findstr },
+									//beforeSend: function() { $("#ds").html("loading"); },
+									success: function(msg) 
+									{ 
+										alert(msg);
+									}
+								});*/
+		};
+	</script>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+        html,body{
+        height: 100%;
+   		 }
+        .btn_box{
+            width: 52px;
+            height: 48px;
+            position: relative;
+        }
+        .btn_box img{
+            width: 23px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%,-50%);
+                    transform: translate(-50%,-50%);
+        }
+        .btn_box .btn_box_text{
+            display: block;
+            text-align: center;
+            line-height: 48px;
+            color: #FFF;
+        }
+        .btn_box.pull-right{
+            background: left center no-repeat;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .btn_box.pull-right:active,.btn_box.pull-right.tap-active{
+            background: #7F0000 left center no-repeat;
+            background-size: 1px 100%;
+        }
+	    #header{
+	        text-align: center;
+			background-color: #0883D9;
+			color: #fff;
+	        width: 100%;
+	    }
+		#footer {
+    		height: 56px;
+			line-height: 55px;
+			background-color: #33FF99;
+			width: 100%;
+			text-align: center;
+    	}
+	    #wrap{
+	        height: 100%;
+	        display: -webkit-box;
+	        -webkit-box-orient: vertical;
+	        -webkit-flex-flow: column;
+	    }
+	    #main{
+	        -webkit-box-flex: 1;
+	        -webkit-flex: 1;
+	    }
+		ul {
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: flex;
+		}
+    	#footer li{
+    		flex:1;
+    		-webkit-flex: 1;
+    		-webkit-box-flex: 1;
+    		height: 55px;
+    	}
+    	#footer li:active{
+    		background: #7F0000
+    	}
+	    #topbar_search {height: 28px;}
+	    .btn_click {background: #DADDE0;}
+	    .h1 {height: 1px;margin-left: 15px;background: #f0f0f0;}
+	    .item {height: 30px;line-height: 30px;padding-left: 15px;background-color: #fff;}
+
+    	.bottom_btn:active {
+    		background: #7F0000
+    	}
+
+    </style>
+</head>
+<body>
+    <div id="wrap">
+	    <div id="header" class="header">
+	        <div class="btn back" onclick="api.closeWin()"></div>
+
+	        <div class="title">问题处理情况</div>
+	        <div class="btn"></div>
+	     	<div class="btn_box pull-right" tapmode="tap-active" onclick="ReAddQuestion()">
+                <span class="btn_box_text">追问</span>
+            </div>
+	    </div>
+        <div id="main">
+
+        </div>
+        <div id="footer">
+	       <ul>
+	        	<li tapmode="bottomhover" onclick="closeQuestion()">
+	        		<span class="bottom_btn">关闭问题</span>
+	        	</li>
+	        </ul>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript">
+	var RootID;
+	var username=localStorage.getItem('badge'); //localStorage.getItem('username');解决没有域账号员工提问空白问题
+	var askclosed='UnClosed';
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+
+	apiready = function()
+	{
+		RootID=api.pageParam.RootID;
+		//alert( JSON.stringify( api.pageParam.FormID ) );
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+        var headerH = $api.offset(header).h;
+		var footerH = $api.offset(footer).h;
+		var frameH = api.winHeight - headerH - footerH;
+
+		api.showProgress({});
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'text',
+			data: {values:{k:'MobileGetAskListStatus',RootID:RootID}}
+
+        },function(ret,err)
+        {
+        	if (ret)
+        	{
+				if(ret=='UnClosed')
+				{
+					askclosed='UnClosed'
+				}
+				else
+				{
+					askclosed='Closed'
+				}
+				api.hideProgress();
+
+				api.openFrame({
+			        name: 'QuestionShow_frm',
+			        url: 'QuestionShow_frm.html',
+			        rect: {
+				        x:0,
+				        y:headerH,
+				        w:'auto',
+				        h:frameH
+			        },
+			        bounces:'false',
+			        pageParam: {RootID:RootID}
+		        });
+        	}
+        	else
+        	{
+        		api.alert({msg:JSON.stringify(err)});
+        		api.hideProgress();
+        	}
+        });
+		//alert(headerH);
+	};
+
+	function ReAddQuestion()
+	{
+		if(askclosed=='UnClosed')
+		{
+			api.openWin({
+	            name: 'ReAddQuestions_win',
+	            url: 'ReAddQuestions_win.html',
+	            pageParam: {RootID:RootID}
+            });
+        }
+        else
+        {
+        	alert("问题已经关闭，不能再追问！");
+        }
+	};
+
+	function closeQuestion()
+	{
+		if(askclosed=='UnClosed')
+		{
+			api.showProgress({});
+			api.ajax({
+				url:serverurl,
+		        method: 'post',
+		        dataType:'text',
+				data: {values:{k:'MobileCloseAskList',ADAccount:username,RootID:RootID}}
+	        },function(ret,err)
+	        {
+	        	if (ret=='ok')
+				{
+					alert("问题关闭成功！");
+					api.closeWin({});
+				}
+				else
+			    {
+			         alert( JSON.stringify( err ) );
+			         api.hideProgress();
+			    }
+	        });
+        }
+        else
+        {
+        	alert("问题已经关闭，不能再关闭！");
+        }
+	};
+</script>
+</html>

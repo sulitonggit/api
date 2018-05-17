@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+        #header {
+            text-align: center;
+            background-color: #0883D9;
+            color: #fff;
+            width: 100%;
+        }
+
+        .h1 {
+            height: 1px;
+            margin-left: 15px;
+            background: #f0f0f0;
+        }
+
+        .item {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 15px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="header" class="header">
+            <div class="btn back" onclick="api.closeWin()"></div>
+            <div class="title">关于我们</div>
+            <div class="btn"></div>
+        </div>
+        <div id="sailunjinyu" align="left">
+            <p><strong style="color:#333;font-size:16px">赛轮金宇集团股份有限公司</strong></p>
+            <p><br/></p>
+            <p>地址：中国山东省青岛市市北区郑州路橡胶谷43号B栋</p><br/>
+            <p>邮编：266045</p><br/>
+            <p>客户热线：400-660-8329</p><br/>
+            <p>邮箱：sljy@sailunjinyu.com<br/></p><br/>
+        </div>
+        <div class="h1"></div><br/>
+
+        <div id="EIP" align="left">
+            <p><strong style="color:#333;font-size:16px">EIP项目组</strong></p>
+            <p><br/></p>
+            <p>地址：青岛市市北区郑州路橡胶谷43号B栋308室</p><br/>
+            <p>邮编：266045</p><br/>
+            <p>邮箱：zhaoyuanjun@sailunjinyu.com<br/></p><br/>
+        </div>
+        <div class="h1"></div><br/>
+
+        <div id="ContactUs" align="center">
+            <h3>联系我们</h3>
+            <table width=100% border="1" bordercolor="#000000">
+                <tr bgcolor="#00CC33">
+                    <td width="103">
+                        <div align="center"><strong>姓名</strong></div>
+                    </td>
+                    <td width="127">
+                        <div align="center"><strong>职责</strong></div>
+                    </td>
+                    <td width="100">
+                        <div align="center"><strong>手机</strong></div>
+                    </td>
+                    <td width="140">
+                        <div align="center"><strong>邮箱</strong></div>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>方道亮</td>
+                    <td>项目经理</td>
+                    <td>13651674782</td>
+                    <td>fangdl@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td>周璇</td>
+                    <td>实施顾问</td>
+                    <td>18253257782</td>
+                    <td>zhouxuan@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td>卜庆龙</td>
+                    <td>项目开发</td>
+                    <td>18661484298</td>
+                    <td>buqinglong@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td>李智超</td>
+                    <td>流程开发</td>
+                    <td>15650176278</td>
+                    <td>lizhichao@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td>姜英辉</td>
+                    <td>HR开发</td>
+                    <td>13052265175</td>
+                    <td>jiangyinghui@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td>方道亮</td>
+                    <td>移动端开发</td>
+                    <td>13651674782</td>
+                    <td>fangdl@sailunjinyu.com</td>
+                </tr>
+                <tr align="center">
+                    <td colspan="2">办公电话</td>
+                    <td colspan="2">0532-66982182</td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <div class="h1"></div><br/>
+
+        <div id="ContactUs" align="center">
+            <h3>二维码</h3>
+            <table width=100% border="1" bordercolor="#000000">
+                <tr bgcolor="#00CC33">
+                    <td width=50%>
+                        <div align="center"><strong>苹果</strong></div>
+                    </td>
+                    <td width=50%>
+                        <div align="center"><strong>安卓</strong></div>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td><img src="https://smartforms.sailunjinyu.com/eipmobile/IOS.png" /></td>
+                    <td><img src="https://smartforms.sailunjinyu.com/eipmobile/Android.png" /></td>
+                </tr>
+            </table>
+        </div>
+        <br />
+    </div>
+</body>
+<script type="text/javascript">
+    apiready = function() {
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+        //var headerH = $api.offset(header).h;
+        //var footerH = 30;
+        //var frameH = api.winHeight - headerH - footerH;
+
+    };
+</script>
+
+</html>

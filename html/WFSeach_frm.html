@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var SRItem=[];
+	var username=localStorage.getItem('username');
+	var SRListView;
+	var _url ='';
+	
+	//var changeSearchResult = function()
+    function changeSearchResult()
+    {
+		//var _url ='http://192.168.31.205/eipmobile/ashx/workflow.ashx?k=SearchResult&ADAccount='+username+'&FindStr='+FindStr;
+		//alert('bb')
+		SRListView.reloadData({
+		     data:[{
+		        title: '新标题',
+		        subTitle: '新子标题',
+		        remark: '新备注',
+		        icon: ''
+		    }]
+		},function(ret){
+		    if( ret ){
+		         alert( JSON.stringify( ret ) );
+		    }else{
+		         alert( JSON.stringify( err ) );
+		    }
+		});
+    };
+        
+	apiready = function(){
+		SRListView = api.require('UIListView');
+		SRListView.open({
+		    rect: {
+		        x: 0,
+		        y: 0,
+		        w: api.winWidth,
+		        h: api.frameHeight
+		    },
+		    data: [{
+		        uid: '1001',
+		        imgPath: 'widget://res/img/apicloud.png',
+		        title: '标题',
+		        subTitle: '子标题，说明文字',
+		        remark: '备注',
+		        icon: ''
+		    }],
+		    styles: {
+		        borderColor: '#696969',
+		        item: {
+		            bgColor: '#AFEEEE',
+		            activeBgColor: '#F5F5F5',
+		            height: 55.0,
+		            imgWidth: 40,
+		            imgHeight: 40,
+		            imgCorner: 4,
+		            placeholderImg: '',
+		            titleSize: 12.0,
+		            titleColor: '#000',
+		            subTitleSize: 12.0,
+		            subTitleColor: '#000', 
+		            remarkColor: '#000',
+		            remarkSize: 16,
+		            remarkIconWidth: 30
+		        }
+		    },
+		    fixedOn: api.frameName
+		}, function(ret, err){
+		    if( ret ){
+		    	if(ret.eventType=='show')
+		    	{
+		    	}
+		    	else
+		    	{
+		         alert( JSON.stringify( ret ) );
+		         		SRListView.reloadData({
+				     data:[{
+				        title: '新标题',
+				        subTitle: '新子标题',
+				        remark: '新备注',
+				        icon: ''
+				    }]
+				},function(ret){
+				    if( ret ){
+				         alert( JSON.stringify( ret ) );
+				    }else{
+				         alert( JSON.stringify( err ) );
+				    }
+				});
+				}
+		    }else{
+		         alert( JSON.stringify( err ) );
+		    }
+		});
+	};
+
+</script>
+</html>

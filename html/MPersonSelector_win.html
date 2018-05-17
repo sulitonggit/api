@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/api.css">
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/zepto.min.js"></script>
+    <script type="text/javascript" src="../script/Vue.min.js"></script>
+    <style>
+        body, html {
+            background: #FFF;
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+        body{
+            font-size: 0.7rem;
+        }
+        #header {
+            text-align: center;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            background-color: #0883D9;
+            color: #fff;
+            width: 100%;
+            height: 48px;
+            position: relative;
+        }
+
+        .btn_box {
+            width: 52px;
+            height: 48px;
+            position: relative;
+        }
+
+        .btn_box img {
+            width: 23px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+        .btn_box .btn_box_text {
+            display: block;
+            text-align: center;
+            line-height: 48px;
+            color: #FFF;
+        }
+
+        .btn_box.pull-left {
+            background: url(../image/webview_dividing.png) right center no-repeat;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn_box.pull-left:active, .btn_box.pull-left.tap-active {
+            background: #7F0000 url(../image/webview_dividing.png) right center no-repeat;
+            background-size: 1px 100%;
+        }
+
+        .search_box {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            background: url(../image/tmall_search_result_input.png) center center no-repeat;
+            background-size: 100% 39px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search_box .home_icon_search {
+            float: left;
+            height: 100%;
+            width: 37px;
+            background: url(../image/tmall_icon_search.png) center center no-repeat;
+            background-size: 18px 18px;
+        }
+
+        .search_box .text {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            /*text-indent: 37px;*/
+            padding-left: 37px;
+            font-size: 0.9em;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .btn_box.pull-right {
+            background: url(../image/webview_dividing.png) left center no-repeat;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn_box.pull-right:active, .btn_box.pull-right.tap-active {
+            background: #7F0000 url(../image/webview_dividing.png) left center no-repeat;
+            background-size: 1px 100%;
+        }
+
+        #content {
+            padding: 0 0.5rem;
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        li {
+            border: 1px solid black;
+            margin-top: -1px;
+            padding: 0.5rem;
+            padding-right: 0;
+        }
+
+        li span {
+            font-size: 0.6rem;
+        }
+        
+        #selectedPersons{
+            position: relative;
+        }
+        #selectedPersons label {
+            display: inline-block;
+            border: 0;
+            margin: 0.25rem;
+            padding: 0.4rem 0.6rem;
+            background-color: #03a9f4;
+            color: white;
+            position: relative;
+        }
+         .aui-badge {
+            display: inline-block;
+            width: auto;
+            text-align: center;
+            min-width: 0.8rem;
+            height: 0.8rem;
+            line-height: 0.8rem;
+            font-size: 0.6rem;
+            color: rgb(255, 255, 255);
+            background-color: rgb(255, 38, 0);
+            position: absolute;
+            top: -0.3rem;
+            right: -0.3rem;
+            z-index: 99;
+            border-radius: 0.3rem;
+        }
+
+        #selectedPersons .btn {
+            width:100%;
+            padding: 0.3rem 0.6rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle; 
+            border: 1px solid transparent;
+            color: #fff;
+            background-color: #009688;
+        }
+
+       
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="wrap">
+    <div id="header">
+        <div class="btn_box pull-left" tapmode="tap-active">
+            <img src="../image/arrow_grey_left_pressed.png" alt="">
+        </div>
+        <div class="search_box">
+            <i class="home_icon_search"></i>
+            <input type="text" id="findstr" placeholder="请输入要查找的内容..." class="text">
+        </div>
+        <div class="btn_box pull-right" tapmode="tap-active" onclick="SearchAddressBook()">
+            <span class="btn_box_text">搜索</span>
+        </div>
+    </div>
+</div>
+<div id="content">
+    <div id="selectedPersons" v-cloak>
+        <template>
+            <label v-for="(item,index) in persons" :data-index="index">
+                {{ item.title }}<span class="aui-badge">×</span>
+            </label>
+            <br>
+            <button v-show="persons.length>0" class="btn">确认上述人员</button>
+        </template>
+    </div>
+
+    <div id="personsProvider" v-cloak>
+        <ul>
+            <template>
+                <li v-for="(person, index) in persons" :data-index="index">
+                    {{ person.title }}
+                    <br/>
+                    <span>{{ person.subTitle }}</span>
+                </li>
+            </template>
+        </ul>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    var username = localStorage.getItem('username');
+    var serverurl = "https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+
+    //绑定点击选择出来的数据
+    var vue_selectedPersons;
+    //绑定服务器数据
+    var vue_persionsProvider;
+
+    apiready = function () {
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        $api.fixIos7Bar(header);
+
+        $(document).ready(function () {
+            vue_selectedPersons = new Vue({
+                el: '#selectedPersons',
+                data: {
+                    persons: []
+                }
+            });
+
+            //这个是二次传入的数据，来显示已经选择的人员
+            if(api.pageParam.selectedPersons_persons){
+                vue_selectedPersons.persons = api.pageParam.selectedPersons_persons;
+            }
+
+            vue_persionsProvider = new Vue({
+                el: '#personsProvider',
+                data: {
+                    persons: {}
+                }
+            });
+
+            //初次加载数据
+            bind2table();
+
+            //绑定点击personProvider的点击事件
+            $('ul').on('click', 'li', function (e) {
+                var index = $(this).data('index');
+                // //从personProvider中去掉该对象,并将当前对象添加到selectedPersons中
+                var arr_selectedPerson = vue_persionsProvider.persons.splice(index, 1);
+                //判断是否出现重复选择人员
+                var in_arr = false;
+                for (var i = 0; i < vue_selectedPersons.persons.length; i++) {
+                    if (vue_selectedPersons.persons[i]['ADAccount'] == arr_selectedPerson[0]['ADAccount']) {
+                        in_arr = true;
+                        break;
+                    }
+                }
+                if (!in_arr) {
+                    vue_selectedPersons.persons.push(arr_selectedPerson[0]);
+                }
+            });
+
+            //绑定点击label移除已选人员事件
+            $('#selectedPersons').on('click', 'label', function () {
+                var index = $(this).data('index');
+                //移除选中的人员
+                var arr_deletedPerson = vue_selectedPersons.persons.splice(index, 1);
+                //将选中的人员加入到下边的列表中，方便二次选择
+                var in_arr = false;
+                for (var i = 0; i < vue_persionsProvider.persons.length; i++) {
+                    if (vue_persionsProvider.persons[i]['ADAccount'] == arr_deletedPerson[0]['ADAccount']) {
+                        in_arr = true;
+                        break;
+                    }
+                }
+                if (!in_arr) {
+                    vue_persionsProvider.persons.push(arr_deletedPerson[0]);
+                }
+            });
+
+            //绑定提交按钮事件
+            $('#selectedPersons').on('click', '.btn', function () 
+            {
+                //TODO 提交数据到前一个页面
+                //console.log(selectedPersons.persons);
+				var data=JSON.stringify(vue_selectedPersons.persons) 
+				var callback_func = 'callback_bind2input("' + api.pageParam.ControlID + '",' + data + ')';
+				
+                api.execScript({
+                    name: 'WFMyDoListform',
+                    frameName: 'WFMyDoListform_frm',
+                    script: callback_func
+                });
+                api.closeWin();
+            })
+        });
+    };
+    //username= 'sailunjinyu\\fangdl';
+    //二次绑定win级窗口传过来的数据
+    function bind2table(searchCondition) {
+        //加载数据
+        if (searchCondition) {
+            var data = {values:{k: 'GetAddressBook', ADAccount: username, FindStr: searchCondition}};
+
+        } else {
+            var data = {values:{k: 'GetMyDepAddressBook', ADAccount: username}};
+        }
+        api.showProgress();
+        api.ajax({
+            type: 'POST',
+            url: serverurl,
+            dataType: 'json',
+            data: data
+        },function (ret, err) {
+            api.hideProgress();
+            if(ret){
+                //alert(JSON.stringify(ret));
+                if (ret.length > 0) {
+                    vue_persionsProvider.persons = ret;
+                } else {
+                    alert('没有匹配到相关数据');
+                }
+            }else{
+                alert('加载失败，请退出重试')
+            }
+        });
+    }
+
+    //搜查
+    function SearchAddressBook() {
+        var searchCondition = $('#findstr').val();
+        bind2table(searchCondition);
+    }
+
+</script>
+</html>

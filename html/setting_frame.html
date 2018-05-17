@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+    	.h10 {height: 10px;background: #f0f0f0;}
+		.h1 {height: 1px;margin-left: 15px;background: #f0f0f0;}
+		.fr {float: right;}
+		.hint {color: #666;font-size: 12px;margin-right: 5px;}
+
+		.firstblock, .secondblock, .thirdblock {background-color: #fff;}
+		/* 头部登陆 */
+		.login {position:relative;background-image: url(../image/api_31.png);background-repeat: no-repeat; background-size: contain;}
+		.loginbg { width: 100%;}
+		.login .personal_logo {position: absolute; left:0;top: 55px; width: 70px; margin-left: 20px;}
+		.person_arrow {position: absolute;height: 20px; right: 10px; top: 90px;}
+		.login .userinfo {position: absolute; top: 60px; margin-left: 100px;}
+		.login .userinfo .title {font-size: 20px; color: #fff;}
+		.login .userinfo .subtitle {font-size: 14px; color: #fff;border: 1px solid #fff;display: inline-block;padding: 3px;border-radius: 4px;margin-top: 5px;}
+
+		/* 设置条目 */
+		.item {height: 50px;line-height: 50px;padding-left: 15px;background-color: #fff;}
+		.item_ico {float: left;width: 30px;padding: 10px 10px 10px 0;}
+		.item_arrow {float: right;width: 16px;padding: 17px 15px 15px 0;}
+
+		.presshover {background-color: #FAFAFA;}
+    </style>
+</head>
+<body>
+	<div class="firstblock">
+		<div class="item" tapmode="presshover" onclick="openask()">
+			<img src="../image/ask.png" alt="" class="item_ico">
+			<span>问题及建议</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="checkUpdate()">
+			<img src="../image/my_setting_user_icon_normal.png" alt="" class="item_ico">
+			<span>版本更新</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="openversionlist()">
+			<img src="../image/version.png" alt="" class="item_ico">
+			<span>EIP平台版本更新说明</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="openMyLoginList()">
+			<img src="../image/my_coupon_user_icon_normal.png" alt="" class="item_ico">
+			<span>登录日志</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="openhelp()">
+			<img src="../image/help.png" alt="" class="item_ico">
+			<span>操作手册</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="openabout()">
+			<img src="../image/my_wallet_user_icon_normal.png" alt="" class="item_ico">
+			<span>关于我们</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+		<div class="item" tapmode="presshover" onclick="openVersionInfo()">
+			<img src="../image/my_wallet_user_icon_normal.png" alt="" class="item_ico">
+			<span>版本信息</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+
+		<div class="item" tapmode="presshover" onclick="SafeExit()">
+			<img src="../image/exit.png" alt="" class="item_ico">
+			<span>安全退出</span>
+			<img src="../image/arrow.png" alt="" class="item_arrow">
+		</div><div class="h1"></div>
+	</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/Login.ashx";
+	var username=localStorage.getItem('username');
+	var badge = localStorage.getItem('badge');
+	var docReader;
+
+	apiready = function()
+	{
+		docReader = api.require('docReader');
+	};
+
+	//检查更新
+	function checkUpdate()
+	{
+		var mam = api.require('mam');
+		mam.checkUpdate(function(ret, err)
+		{
+			if (ret)
+			{
+				var result = ret.result;
+				if (result.update == true & result.closed == false)
+				{
+					var str = '新版本型号:' + result.version + ';更新提示语:' + result.updateTip + ';下载地址:' + result.source + ';发布时间:' + result.time;
+					api.confirm({
+                            title : '有新的版本,是否下载并安装 ',
+                            msg : str,
+                            buttons : ['确定', '取消']
+							}, function(ret, err)
+							{
+								if (ret.buttonIndex == 1)
+								{
+									if (api.systemType == "android")
+									{
+										api.download({
+                                        url : result.source,
+                                        report : true
+                                    }, function(ret, err)
+                                    	{
+											if (ret && 0 == ret.state)
+											{/* 下载进度 */
+												api.toast({
+                                                msg : "正在下载应用" + ret.percent + "%",
+                                                duration : 2000
+												});
+                                        	}
+											if (ret && 1 == ret.state)
+											{/* 下载完成 */
+                                            var savePath = ret.savePath;
+                                            api.installApp({
+                                                appUri : savePath
+                                            	});
+                                        	}
+										});
+                                	}
+									if (api.systemType == "ios")
+									{
+	                                    api.installApp({
+	                                        appUri : result.source
+	                                    });
+	                                }
+								}
+                        });
+                    }
+                    else
+                    {
+                        api.alert({
+                            msg : "暂无更新"
+                        });
+                    }
+                }
+                else
+                {
+                    api.alert({
+                        msg : err.msg
+                    });
+                }
+            });
+	};
+
+	//安全退出
+	function SafeExit()
+	{
+		api.confirm(
+		{
+			title : '退出',
+			msg : '是否要退出？',
+			buttons : ['确定', '取消']
+		},function(ret,err)
+		{
+			if (ret.buttonIndex == 1)
+			{
+				//退出
+				localStorage.clear();
+		    	//显示加载条
+				api.showProgress({});
+				//保存退出记录数据
+				api.ajax({
+					url:serverurl,
+			        method: 'post',
+			        dataType:'text',
+					data: {values:{k: 'SafeQuit', username: badge,EquipmentType:api.systemType}}
+
+		        },function(ret,err)
+		        {
+		        	//如果返回成功返回结果
+		        	if (ret)
+		        	{
+						api.hideProgress();
+		        	}
+		        	else
+		        	{
+		         		api.alert({msg:JSON.stringify(err)});
+		         		api.hideProgress();
+		         	}
+		        });
+				setTimeout(function()
+				{
+					api.openWin({name : 'login',url : '../html/login.html',reload : true});
+				}, 500);
+			}
+		});
+	};
+	//关于我们
+	function openabout()
+	{
+		api.openWin({
+	        name: 'about',
+	        url: 'about.html'
+        });
+	}
+	//EIP平台版本更新说明
+	function openversionlist()
+	{
+		api.openWin({
+	        name: 'versionlist_win',
+	        url: 'versionlist_win.html'
+        });
+	}
+	//登录日志
+	function openMyLoginList()
+	{
+		api.openWin({
+	        name: 'MyLoginList_win',
+	        url: 'MyLoginList_win.html'
+        });
+	}
+	//操作手册
+	function openhelp()
+	{
+
+		docReader.open({
+		    path: 'widget://res/help.doc'
+		}, function(ret, err)
+		{
+		    if (ret.status)
+		    {
+		        //alert(JSON.stringify(ret));
+		    }
+		    else
+		    {
+		        alert(JSON.stringify(err));
+		    }
+		});
+	}
+	//问题建议
+	function openask()
+	{
+		api.openWin({
+	        name: 'askList_win',
+	        url: 'askList_win.html'
+        });
+	}
+	function openVersionInfo(){
+	   api.openWin({
+	       name: 'versionInfo_win',
+	       url: 'versionInfo_win.html'
+       });
+	}
+</script>
+</html>

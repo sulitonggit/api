@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var mydoListView;
+    var username = localStorage.getItem('username');
+    var password=escape(localStorage.getItem('password'));
+    var wfretlist = [];
+    var serverurl="https://smartforms.sailunjinyu.com/eipmobile/Document.ashx";
+    var FileType = "子公司通知";
+    var dmg;
+	var domain;
+	var account;
+	var targeturl="";
+
+    apiready = function () {
+
+        dmg = api.require('downloadManager');
+        //获取数据
+        api.showProgress({});
+        //从服务器获取数据
+        api.ajax({
+            url: serverurl,
+            method: 'post',
+            dataType: 'json',
+            data: {values: {k: 'GetSubsidiaryNoticeList', ADAccount: username, FileType: FileType}}
+
+        }, function (ret, err) {
+            //如果返回成功返回结果
+            if (ret) {
+                //保存列表数据
+                for (var idx in ret) {
+                    wfretlist[idx] = ret[idx];
+                }
+                mydoListView = api.require('UIListView');
+                mydoListView.open({
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: api.frameHeight
+                    },
+                    data: ret,
+				    /*rightBtns: [{
+				        bgColor: '#388e8e',
+				        activeBgColor: '',
+				        width: 70,
+				        title: '下载',
+				        titleSize: 12,
+				        titleColor: '#fff',
+				        icon: '',
+				        iconWidth: 20
+				    }],*/
+				    styles: {
+				        borderColor: '#696969',
+				        item: {
+				            bgColor: '#FFFFFF',
+				            activeBgColor: '#F5F5F5',
+				            height: 70.0,
+				            imgWidth: 40,
+				            imgHeight: 40,
+				            imgCorner: 4,
+				            placeholderImg: '',
+				            titleSize: 14.0,
+				            titleColor: '#000',
+				            subTitleSize: 12.0,
+				            subTitleColor: '#000',
+				            remarkColor: '#000',
+				            remarkSize: 12,
+				            remarkIconWidth: 30
+				        }
+				    },
+                    fixedOn: api.frameName
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.eventType == 'show') {
+                            //alert('加载成功');
+                        }
+                        else if (ret.eventType == 'clickRightBtn' && ret.btnIndex == 0) {
+                            var DownloadUrl = wfretlist[ret.index].FilePath;
+                            var FileName = wfretlist[ret.index].title;
+                            ///开始下载内容
+                            startdown(FileName, DownloadUrl);
+                            //打开下载界面
+                           // openview();
+                        }
+                        else
+                        {
+			    			var WopiPath=wfretlist[ret.index].WopiPath;
+			    			WopiPath=escape(WopiPath);
+			    			domain=username.substring(0, username.indexOf('\\'))
+			    			account=username.substring(username.indexOf('\\')+1,username.length)
+			    			targeturl="https://eip.sailunjinyu.com/WinAuth/Auth.html?domain="+domain+"&account="+account+"&userpwd="+password+"&targeturl="+WopiPath
+			    			//alert(targeturl);
+							api.openWin({
+								slidBackEnabled :false,
+	                            name: 'DocumentURLform',
+	                            url: 'DocumentURLform_win.html',
+	                            pageParam: {URL:targeturl}
+
+                            });
+                        }
+                    }
+                    else {
+                        alert(JSON.stringify(err));
+                        api.hideProgress();
+                    }
+                    ///隐藏加载
+                    api.hideProgress();
+                });
+
+                ///下拉重新加载
+                mydoListView.setRefreshHeader({
+                    bgColor: '#F5F5F5',
+                    textColor: '#8E8E8E',
+                    textDown: '下拉可以刷新...',
+                    textUp: '松开开始刷新...',
+                    showTime: true
+                }, function (ret, err) {
+                    if (ret) {
+                        //api.showProgress({});
+                        //重新加载数据
+                        api.ajax({
+                            url: serverurl,
+                            method: 'post',
+                            dataType: 'json',
+                            data: {values: {k: 'GetSubsidiaryNoticeList', ADAccount: username, FileType: FileType}}
+
+                        }, function (ret, err) {
+                            //如果返回成功返回结果
+                            if (ret) {
+                                wfretlist = [];
+                                for (var idx in ret) {
+                                    wfretlist[idx] = ret[idx];
+                                }
+                                mydoListView.reloadData({
+                                    data: ret
+                                }, function (ret) {
+                                    if (ret) {
+                                        //alert( JSON.stringify( ret ) );
+                                    } else {
+                                        alert(JSON.stringify(err));
+                                    }
+                                });
+                            }
+                            else {
+                                api.alert({msg: JSON.stringify(err)});
+                            }
+
+                        });
+                    }
+                    else {
+                        alert(JSON.stringify(err));
+                    }
+                    ///隐藏加载
+                    //api.hideProgress();
+                });
+
+            }
+            else {
+                api.alert({msg: JSON.stringify(err)});
+                api.hideProgress();
+            }
+
+        });
+
+    };
+
+    //下载文档
+    function startdown(FileName, DownloadUrl)
+    {
+	    dmg.enqueue({
+	    url: DownloadUrl,
+	    savePath: 'fs://'+FileName,
+	    cache: true,
+	    allowResume: true,
+	    title: FileName,
+	    networkTypes: 'all'
+		}, function(ret, err)
+		{
+		    if (ret)
+		    {
+			        //alert(JSON.stringify(ret));
+			        //alert("下载已经开始!");
+			}
+			else
+			{
+			        alert(JSON.stringify(err));
+			}
+		});
+    }
+
+    function openview() {
+        dmg.openManagerView(onItemClick);
+    }
+
+    //点击打开文档
+    function onItemClick(ret, err) {
+        if (ret) {
+            var did = ret.id;
+            dmg.openDownloadedFile({id: did});
+        }
+    }
+
+    //搜索结果
+    function SubsidiaryNoticechangeSearchResult(findstr) {
+        //显示加载条
+        api.showProgress({});
+        //从服务器获取数据
+        api.ajax({
+            url: serverurl,
+            method: 'post',
+            dataType: 'json',
+            data: {values: {k: 'GetSearchSubsidiaryNoticeList', ADAccount: username, FindStr: findstr, FileType: FileType}}
+        }, function (ret, err) {
+            if (ret) {  //返回成功
+                if(ret.length == 0){  //没有匹配到数据
+                    api.hideProgress();
+                    alert('没有匹配的数据');
+                    return false;
+                }
+                wfretlist = [];
+                for (var idx in ret) {
+                    wfretlist[idx] = ret[idx];
+                }
+                mydoListView.reloadData({
+                    data: ret,
+                }, function (ret) {
+                    if (ret) {
+                        //alert( JSON.stringify( ret ) );
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+            }
+            else {
+                api.alert({msg: JSON.stringify(err)});
+                api.hideProgress();
+            }
+            ///隐藏加载
+            api.hideProgress();
+        });
+    }
+</script>
+</html>

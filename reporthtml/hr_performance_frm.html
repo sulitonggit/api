@@ -1,0 +1,455 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>HR 绩效</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui_2.1/aui.css" />
+    <link rel="stylesheet" href="../css/api.css">
+
+    <style>
+        table {
+            width: 100%;
+            word-wrap: break-word;
+            table-layout: fixed;
+        }
+        
+        td,
+        th {
+            border: 1px solid #757575;
+        }
+        
+        #tab1 td {
+            width: 25%;
+        }
+        
+        #tab1 td:nth-of-type(even) {
+            width: 75%;
+        }
+        
+        .info {
+            display: flex;
+        }
+        
+        .left {
+            display: flex;
+            width: 10%;
+            align-items: center;
+            border: 1px solid #757575;
+            margin-right: -1px;
+            justify-content: center;
+        }
+        
+        .right {
+            width: 90%;
+        }
+        
+        [v-cloak] {
+            display: none;
+        }
+        
+        .width-25 {
+            width: 20% !important;
+        }
+        
+        #infomation {
+            padding-bottom: 60px;
+        }
+        
+        .aui-bar-tab .aui-bar-tab-label {
+            font-size: 0.8rem;
+        }
+        
+        .aui-bar-tab .aui-active {
+            border-top: 2px solid #039be5;
+        }
+    </style>
+</head>
+
+<body class="aui-font-size-12">
+    <div id="infomation">
+        <div>
+            <ul class="aui-list aui-form-list aui-font-size-12">
+                <li class="aui-list-item">
+
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-label width-25">
+                            期间
+                        </div>
+                        <div class="aui-list-item-input">
+                            <select @change="change_term" id="term">
+                            <option v-for="term in terms">{{term}}</option>                           
+                        </select>
+                        </div>
+                        <div class="aui-list-item-input" style="width: 55px">
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-list-item">
+
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-label width-25">
+                            岗位
+                        </div>
+                        <div class="aui-list-item-input">
+                            <select id="position">
+                            <option v-for="position in term_positions" :value="position.JobID">{{ position.Location }}</option>
+                        </select>
+                        </div>
+                        <div class="aui-list-item-input" style="width: 55px">
+                            <button type="" class="aui-btn aui-btn-info aui-font-size-12" style="padding: 0 5px;" id="search">查询</button>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <div class="aui-content-padded">
+            <div id="tab1">
+                <template v-if='tab1.length > 0'>
+                    <table>
+                    <tr>
+                        <td>工号</td>
+                        <td>{{ tab1[0].Badge }}</td>
+                    </tr>
+                    <tr>
+                        <td>姓名</td>
+                        <td>{{ tab1[0].Name }}</td>
+                    </tr>
+                    <tr>
+                        <td>本职岗</td>
+                        <td>{{tab1[0].JobName}}</td>
+                    </tr>
+                    <tr>
+                        <td>是否兼职</td>
+                        <td>{{ tab1[0].IsPart }}</td>
+                    </tr>
+                    <tr>
+                        <td>兼职岗1</td>
+                        <td>{{ tab1[0].JJobName? tab1[0].JJobName:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>兼职岗2</td>
+                        <td>{{ tab1[0].JJobName2? tab1[0].JJobName2:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>兼职岗3</td>
+                        <td>{{ tab1[0].JJobName3? tab1[0].JJobName3:'' }}</td>
+                    </tr>
+                    <tr>
+                        <td>兼职岗4</td>
+                        <td>{{ tab1[0].JJobName4? tab1[0].JJobName4:'' }}</td>
+                    </tr>
+                </table>
+                <p>
+                    说明‎：
+                </p>
+                <ul>
+                    <li>
+                        1‎、‎‎对于兼职岗位的考核取兼职岗位绩效权重‎，‎本职岗位和兼职岗位绩效权重之和为‎100‎%‎；‎考核周期一栏‎“‎年‎/‎季月‎”‎代表‎“‎年‎/‎季度指标在当月份中的完成情‎ 况‎”‎。‎
+                    </li>
+                    <li>
+                        2‎、‎公式‎：‎
+                        <ul>
+                            <li>
+                                （‎1‎）‎达成类指标完成率‎：‎实际值‎/‎目标值‎*‎100‎%‎
+                            </li>
+                            <li>
+                                （‎2‎）‎‎控制类指标完成率‎：‎1‎-‎（（‎实际值‎-‎目标值‎）‎/‎目标值‎）‎*‎100‎%‎
+                            </li>
+                            <li>
+                                （‎3‎）‎‎差异率‎：‎完成率‎-‎1‎
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                </template>
+            </div>
+            <div id="tab2" class="aui-hide ">
+                <template v-if='tab2.length > 0'>
+                <div class="info" v-for="(item,index) in tab2">                   
+                    <div class="left">{{ index+1 }}</div>
+                    <div class="right">
+                        <table>
+                            <tr>
+                                <td>考核项目</td>
+                                <td colspan="3">
+                                    <div  class="aui-ellipsis-2">{{item.ItemName}}</div>
+                                    </td>
+                            </tr>
+                            <tr>
+                                <td>目标值</td>
+                                <td>{{item.BValue}}</td>                            
+                                <td>单位</td>
+                                <td>{{item.Unit}}</td>
+                            </tr>
+                            <tr>
+                                <td>‎权重‎</td>
+                                <td>{{item.Weight}}</td>
+                                <td>考核周期</td>
+                                <td>{{item.pTermName}}</td>
+                            </tr>
+                            <tr>
+                                <td>实际值</td>
+                                <td>{{item.FactValue}}</td>
+                                <td>奖罚分数‎</td>
+                                <td>{{item.FRPScore}}</td>
+                            </tr>
+                            <tr>
+                                <td>备注</td>
+                                <td colspan="3">
+                                    <div class="aui-ellipsis-2"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>                     
+                </div>
+                </template>
+            </div>
+            <div id="tab3" class="aui-hide ">
+                <template v-if="tab3.length > 0">
+                <div class="info" v-for="(item,index) in tab3">
+                    <div class="left">{{index+1}}</div>
+                    <div class="right">
+                        <table>
+                            <tr>
+                                <td>岗位</td>                                
+                                <td colspan="3"> <div  class="aui-ellipsis-2">{{item.JobName}}</div></td>
+                            </tr>
+                            <tr>
+                                <td>标准分数</td>
+                                <td>{{item.StandardScore}}</td>
+                                <td>最终得分</td>
+                                <td>{{item.FpScore}}</td>  
+                            </tr>
+                            <tr>
+                                <td>‎岗绩效权重</td>
+                                <td>{{item.pRate}}</td>
+                                 <td>‎岗标准分数‎</td>
+                                <td>{{item.StandardScoreTotal}}</td>
+                              </tr>
+                            <tr>                                 
+                               <td>最终奖罚分</td>
+                                <td>{{item.FRPScore}}</td>
+                                <td>考核周期</td>
+                                <td>{{item.pTermName}}</td>
+                            </tr>                            
+                            <tr>
+                                <td>备注</td>
+                                <td colspan="3">
+                                    <div class="aui-ellipsis-2"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </template>
+            </div>
+            <div id="tab4" class="aui-hide">
+                <template v-if="tab4.length > 0">
+                <div class="info" v-for="(item,index) in tab4">
+                    <div class="left">{{index+1}}</div>
+                    <div class="right">
+                        <table>
+                            <tr>
+                                <td>岗位</td>
+                                <td colspan="3"> <div  class="aui-ellipsis-2">{{item.JobName}}</div></td>
+                            </tr>
+                            <tr>
+                                <td>标准分数</td>
+                                <td>{{item.StandardScore}}</td>
+                                <td>最终得分</td>
+                                <td>{{item.FpScore}}</td>  
+                            </tr>
+                            <tr>
+                                <td>‎岗绩效权重</td>
+                                <td>{{item.pRate}}</td>
+                                 <td>‎岗标准分数‎</td>
+                                <td>{{item.StandardScoreTotal}}</td>
+                              </tr>
+                            <tr>                                 
+                               <td>最终奖罚分</td>
+                                <td>{{item.FRPScore}}</td>
+                                <td>考核周期</td>
+                                <td>{{item.pTermName}}</td>
+                            </tr>                            
+                            <tr>
+                                <td>备注</td>
+                                <td colspan="3">
+                                    <div class="aui-ellipsis-2"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="left">总计</div>
+                    <div class="right">
+                        <table>
+                            <tr>
+                                <td>最终奖罚分</td>
+                                <td colspan="3">{{tab4[0]['TotalScore']}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </template>
+            </div>
+        </div>
+    </div>
+
+    <footer class="aui-bar aui-bar-tab" id="footer">
+        <div class="aui-bar-tab-item aui-active" tapmode>
+            <div class="aui-bar-tab-label">基本信息</div>
+        </div>
+        <div class="aui-bar-tab-item" tapmode>
+            <div class="aui-bar-tab-label">考核信息</div>
+        </div>
+        <div class="aui-bar-tab-item" tapmode>
+            <div class="aui-bar-tab-label">岗位汇总</div>
+        </div>
+        <div class="aui-bar-tab-item" tapmode>
+            <div class="aui-bar-tab-label">总汇总</div>
+        </div>
+    </footer>
+</body>
+<script type="text/javascript" src="../script/Vue.min.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/aui_2.1/aui-tab.js"></script>
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+
+<script type="text/javascript">
+    //var server_url = 'http://192.168.237.31:8010/normal.ashx';
+    var server_url = 'https://smartforms.sailunjinyu.com/eipmobile/normal.ashx'
+    // 数据容器
+    $(document).ready(function() {
+
+        var info = new Vue({
+            el: "#infomation",
+            data: {
+                terms: [],
+                positions: [],
+                term_positions: [],
+                tab1: [],
+                tab2: [],
+                tab3: [],
+                tab4: []
+            },
+            mounted: function() {
+
+            },
+            updated: function() {
+
+            },
+            methods: {
+                change_term: function(initial, event) {
+                    var term = $(event.currentTarget).find('option:selected').text();
+
+                    var arr_positions = [];
+                    for (var i = 0; i < this.positions.length; i++) {
+                        if (this.positions[i]['term'] == term) {
+                            arr_positions.push(this.positions[i]);
+                        }
+                    }
+                    this.term_positions = arr_positions;
+                }
+            }
+        });
+
+        apiready = function() {
+            // 条件数据的加载
+            api.showProgress();
+            $.ajax({
+                url: server_url,
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    k: 'GetHRPerformanceCondition',
+                    badge: localStorage.getItem('badge')
+                        //badge: '411613' //localStorage.getItem('badge')
+                },
+                success: function(data) {
+                    //保存所有的positions
+                    info.positions = data;
+
+                    var arr_term = [];
+                    var arr_term_positions = [];
+                    for (var i = 0; i < data.length; i++) {
+                        arr_term.push(data[i].term);
+                    }
+
+                    //去重
+                    arr_term.sort();
+                    $.unique(arr_term);
+                    info.terms = arr_term;
+
+                    //默认是第一个term，找到对应的岗位
+                    for (var j = 0; j < data.length; j++) {
+                        if (data[j]['term'] == arr_term[0]) {
+                            arr_term_positions.push(data[j]);
+                        }
+                    }
+                    info.term_positions = arr_term_positions;
+                },
+                error: function() {
+                    alert('请求出错');
+                },
+                complete: function() {
+                    api.hideProgress();
+                }
+            });
+        }
+
+        //查询具体信息
+        $('#search').click(function() {
+            api.showProgress();
+            var term = $('#term').find('option:selected').text()
+            var position_id = $('#position').find('option:selected').val();
+
+            //发送请求，获取数据
+            $.ajax({
+                url: server_url,
+                method: 'post',
+                dataType: 'json',
+                data: {
+                    k: 'GetHRPerformanceDetail',
+                    term: term,
+                    position_id: position_id,
+                    badge: localStorage.getItem('badge')
+                        //badge: '411613' //localStorage.getItem('badge')
+                },
+                success: function(data) {
+                    //绑定数据到vue                   
+                    info.tab1 = data.tab1;
+                    info.tab2 = data.tab2;
+                    for (var i = 0; data.tab4.length; i++) {
+                        if (data.tab4[i]['JobID'] == position_id) {
+                            info.tab3 = [];
+                            info.tab3.push(data.tab4[i]);
+                            break;
+                        }
+                    }
+                    info.tab4 = data.tab4;
+                },
+                error: function() {
+                    alert('请求出错');
+                },
+                complete: function() {
+                    api.hideProgress();
+                }
+            })
+        })
+
+        var tab = new auiTab({
+            element: document.getElementById("footer"),
+        }, function(ret) {
+            $('.aui-content-padded > div').addClass('aui-hide');
+            $('#tab' + ret.index).removeClass('aui-hide');
+        });
+    });
+</script>
+
+</html>

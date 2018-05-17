@@ -1,0 +1,403 @@
+<!DOCTYPE html>	
+<html>	
+<head>	
+  <meta charset="utf-8">	
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>	
+  <title>frame</title>	
+  <link rel="shortcut icon" href="/favicon.ico">	
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">	
+  <link rel="stylesheet" type="text/css" href="../css/api.css" />	
+	<style>	
+		html {width: 100%;height: 100%;background: #e5e5e5;}	
+		body {background: #e5e5e5;width: 100%;/*height: 100%;*/}	
+		.recommand_card {box-sizing:border-box;-webkit-box-sizing:border-box;float: left;width: 50%;padding-left: 5px;padding-right: 5px;text-align: center;font-size: 12px;margin-bottom: 10px;}	
+		.recommand_card img {width: 100%;}	
+		.subtitle {padding-left: 5px; padding-bottom: 10px;font-size: 14px; font-weight: bold;}	
+		.divider {height: 10px;clear: both;}	
+		.innerCard {background: #fff;}	
+		.videotitle {padding-bottom: 4px;padding-left: 5px;}	
+		.tvshow_row {height: 137px;}	
+		.tvshow_row .innerCard{text-align: left;position: relative;}	
+		.videosubtitle {font-size: 10px; color: #909090;padding-left: 5px;padding-bottom: 5px;}	
+		.update {position: absolute; bottom: 45px; margin-left: 5px; color: #fff;}	
+		.card_hover {background: #0f0;}	
+		/* 图片轮播样式 */	
+		.pagination {position: absolute; z-index: 20; right: 10px; bottom: 10px; }	
+		.swiper-pagination-switch {display: inline-block; width: 8px; height: 8px; border-radius: 8px; background: #555; margin-right: 5px; opacity: 0.8; border: 1px solid #fff; cursor: pointer; }	
+		.swiper-active-switch {background: #fff; }	
+	
+	
+		.swipe {	
+			width: 100%;	
+	        background-color: #fff;	
+	        overflow: hidden;	
+	        position: relative;	
+	        padding-bottom: 10px;	
+	    }	
+	    .swipe-wrap {	
+	        overflow: hidden;	
+	        position: relative;	
+	    }	
+	    .swipe-wrap .swipe-box {	
+	        float: left;	
+	        width: 100%;	
+	        position: relative;	
+	    }	
+		.swipe-box img{	
+			width:100%;	
+		}	
+		.swipe .title-box {	
+			width:100%;	
+			position: relative;	
+		}	
+		.swipe .title-box-ul{	
+			text-align: right;	
+			list-style: none;	
+			margin: 0;	
+			padding: 0;	
+			padding-right: 10px;	
+		}	
+		.swipe .title-box li {	
+			display: inline-block;	
+			width: 10px;	
+			height: 10px;	
+			border-radius: 10px;	
+			background: #e5e5e5;	
+			box-shadow: inset 0 1px 3px black,0 0 1px 1px #f2f2f2;	
+			margin: 0 2px;	
+			cursor: pointer;	
+		}	
+		.swipe .title-box li.active{	
+			background-color: #6ab494;	
+			background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#1293dc),color-stop(100%,#0f6297));	
+			background-image: -webkit-linear-gradient(top,#6ab494,#0f6297);	
+			background-image: -moz-linear-gradient(top,#6ab494,#0f6297);	
+			background-image: -ms-linear-gradient(top,#6ab494,#0f6297);	
+			background-image: -o-linear-gradient(top,#6ab494,#0f6297);	
+			background-image: linear-gradient(top,#6ab494,#0f6297);	
+		}	
+	</style>	
+</head>	
+<body>	
+	<div id="swipe" class="swipe">	
+		<div class="swipe-wrap">	
+			<div class="swipe-box"> 	
+				<img src="../image/api_2.png" alt="">	
+			</div>	
+			<div class="swipe-box">	
+				<img src="../image/api_3.png" alt="">	
+			</div>	
+			<div class="swipe-box">	
+				<img src="../image/api_4.png" alt="">	
+			</div>	
+		</div>	
+		<div class="title-box">	
+            <ul class="title-box-ul">	
+                <li class="active"></li>	
+                <li></li>	
+                <li></li>	
+            </ul>	
+        </div>	
+	</div>	
+	<div class="divider"></div>	
+	<div class="subtitle">流程管理</div>	
+	<ul class="recommand_row">	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenMyDoList()">	
+			<div class="innerCard">	
+				<img src="../image/wfmydo.png" alt="">	
+				<div class="videotitle" id='WFMyDoListNum'>您有0条待办流程</div>	
+			</div>	
+		</li>	
+		<li class="recommand_card"  tapmod="card_hover" onclick="OpenMyApplyList()">	
+			<div class="innerCard">	
+				<img src="../image/fwmyapply.png" alt="">	
+				<div class="videotitle">我申请的流程</div>	
+			</div>	
+		</li>	
+	</ul>	
+	<ul class="recommand_row">	
+		<li class="recommand_card"  tapmod="card_hover" onclick="OpenMyDealList()">	
+			<div class="innerCard">	
+				<img src="../image/wfhavedo.png" alt="">	
+				<div class="videotitle">我已办的流程</div>	
+			</div>	
+		</li>	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenSendList()">	
+			<div class="innerCard">	
+				<img src="../image/fwsend.png" alt="">	
+				<div class="videotitle">发起流程</div>	
+			</div>	
+		</li>	
+	</ul>	
+	<div class="divider"></div>	
+	<div class="subtitle">任务管理</div>	
+	<ul class="tvshow_row">	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenTaskMyDoList()">	
+			<div class="innerCard">	
+				<img src="../image/tmydo.png" alt="">	
+				<!--<div class="update">您有10条待办任务</div>-->
+				<div class="videotitle" id='TaskMyDoListNum'>您有0条待办任务</div>	
+				<div class="videosubtitle"></div>	
+			</div>	
+		</li>	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenMyApplyTaskList()">	
+			<div class="innerCard">	
+				<img src="../image/tmyapply.png" alt="">	
+				<div class="update"></div>	
+				<div class="videotitle">我发起的任务</div>	
+				<div class="videosubtitle"></div>	
+			</div>	
+		</li>	
+	</ul>	
+	<ul class="tvshow_row">	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenMyDealTaskList()">	
+			<div class="innerCard">	
+				<img src="../image/thavedo.png" alt="">	
+				<div class="update"></div>
+				<div class="videotitle">我处理的任务</div>	
+				<div class="videosubtitle"></div>	
+			</div>	
+		</li>	
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenMyJoinTaskList()">	
+			<div class="innerCard">	
+				<img src="../image/tmypart.png" alt="">	
+				<div class="update"></div>	
+				<div class="videotitle">我参与的任务</div>	
+				<div class="videosubtitle"></div>
+			</div>	
+		</li>	
+	</ul>	
+	<div class="subtitle"></div>
+</body>	
+<script type="text/javascript" src="../script/api.js"></script>	
+<script type="text/javascript" src="../script/swipe.js"></script>	
+<script>
+	var username=localStorage.getItem('username');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	var MyDoListNum=[];
+	var alias=localStorage.getItem('alias').toUpperCase();
+	
+	window.onload = function() 
+	{	
+		var li = $api.domAll('.title-box-ul li');	
+		var mySwiper = Swipe($api.byId('swipe'),{	
+			auto:3000,	
+			continuous: true,
+			callback: function(index,elem) {	
+                var i = li.length;	
+                while (i--) {	
+                    li[i].className = '';	
+                }	
+                li[index].className = 'active';	
+            }	
+		});	
+	}	
+	apiready = function ()
+	{
+    	//消息推送绑定用户
+		/*var push = api.require('push');
+		push.bind({
+		    userName:username,
+		    userId:username
+		},function(ret,err)
+		{
+		    if(ret.status)
+		    {
+		        //api.alert({msg:'绑定成功'});
+		    }
+		    else
+		    {
+		    	//api.alert({msg:'绑定失败'});
+		        api.alert({msg:err.msg});
+		    }
+		});	
+		///设置监听，获取消息
+		//var push = api.require('push');
+		push.setListener(
+		function(ret,err)
+		{
+			if(ret)
+			{
+				//alert('主界面')
+				//api.alert({msg:ret.data});
+			}
+		}
+		);*/
+		//使用极光推送
+		
+		var jpush = null;
+		//初始化推送
+		jpush = api.require('ajpush');
+		jpush.init(function(ret) 
+		{
+			if(ret && ret.status)
+			{
+				//alert('极光推送初始化操作成功!');
+			}
+			else
+			{
+				//alert('极光推送初始化操作失败!');
+			}
+		});
+		
+		jpush.bindAliasAndTags(
+		{
+			alias:alias,
+			tags:alias
+		}, function(ret, err)
+		{
+			//alert('处理结果：\n' + JSON.stringify(ret));
+			//alert(alias);
+		});
+		jpush.setListener(
+		    function(ret) 
+		    {
+		         var id = ret.id;
+		         var title = ret.title;
+		         var content = ret.content;
+		         var extra = ret.extra;
+		    }
+		);
+			
+		//获取各待办数据
+		api.showProgress({});
+		
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'json',
+			data: {values:{k:'GetMyDoListNum',username:username}}
+        },function(ret,err)
+        {
+			if (ret)
+			{
+				for(var idx in ret)
+				{
+					//MyDoListNum[idx] = ret[idx];
+					if(ret[idx].ModuleName=='WFMyDoList')
+					{
+						document.getElementById ("WFMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办任务';
+					}
+					if(ret[idx].ModuleName=='TaskMyDoList')
+					{
+						document.getElementById ("TaskMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办任务';
+					}
+	            }
+	            
+				///隐藏加载
+				api.hideProgress();	
+			}
+			else
+        	{
+         		api.alert({msg:JSON.stringify(err)});
+         		api.hideProgress();        	
+        	}			
+        });
+        
+		api.setRefreshHeaderInfo(
+		{	
+			visible: true,	
+			bgColor: 'rgba(0,0,0,0)',	
+			textColor: '#666',	
+			textDown: '下拉刷新',	
+			textUp: '释放刷新'		
+		}, function(ret, err)
+		{
+			//获取各待办数据
+			api.showProgress({});
+			
+			api.ajax({
+				url:serverurl,
+		        method: 'post',
+		        dataType:'json',
+				data: {values:{k:'GetMyDoListNum',username:username}}
+	        },function(ret,err)
+	        {
+				if (ret)
+				{
+					for(var idx in ret)
+					{
+						//MyDoListNum[idx] = ret[idx];
+						if(ret[idx].ModuleName=='WFMyDoList')
+						{
+							document.getElementById ("WFMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办流程';
+						}
+						if(ret[idx].ModuleName=='TaskMyDoList')
+						{
+							document.getElementById ("TaskMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办任务';
+						}						
+		            }
+		            
+					///隐藏加载
+					api.hideProgress();	
+				}
+				else
+	        	{
+	         		api.alert({msg:JSON.stringify(err)});
+	         		api.hideProgress();        	
+	        	}			
+	        });	
+		    api.refreshHeaderLoadDone();	
+		});
+	
+	};	
+	///流程待办列表
+	function OpenMyDoList()
+	{
+		api.openWin({
+	        name: 'WFMyDoList',
+	        url: 'WFMyDoList_win.html'
+        });
+	};
+	//流程我的申请
+	function OpenMyApplyList()
+	{
+		api.openWin({
+	        name: 'WFMyApplyList',
+	        url: 'WFMyApplyList_win.html'
+        });
+	};
+	//流程我的处理
+	function OpenMyDealList()
+	{
+		api.openWin({
+	        name: 'WFMyApprovalList',
+	        url: 'WFMyApprovalList_win.html'
+        });
+	};	
+	//发起流程
+	function OpenSendList()
+	{
+		alert('暂未开放，请等待后续更新！');
+	};
+	//我的待办任务
+	function OpenTaskMyDoList()
+	{
+		api.openWin({
+	        name: 'TaskMyDoList',
+	        url: 'TaskMyDoList_win.html'
+        });
+	};
+	//我申请的任务
+	function OpenMyApplyTaskList()
+	{
+		api.openWin({
+	        name: 'TaskMyApplyList',
+	        url: 'TaskMyApplyList_win.html'
+        });
+	};
+	//我处理的任务
+	function OpenMyDealTaskList()
+	{
+		api.openWin({
+	        name: 'TaskMyApprovalList',
+	        url: 'TaskMyApprovalList_win.html'
+        });
+	};
+	//我参与的任务
+	function OpenMyJoinTaskList()
+	{
+		alert('暂未开放，请等待后续更新！');
+	};
+</script>	
+</html>	

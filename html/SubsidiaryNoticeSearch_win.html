@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+       body,html{
+            background: #FFF;
+        }
+        #header{
+            text-align: center;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+		    background-color: #0883D9; 
+		    color: #fff;
+		    width: 100%;
+		    height: 48px;
+		    position: relative;
+        }
+
+        .btn_box{
+            width: 52px;
+            height: 48px;
+            position: relative;
+        }
+        .btn_box img{
+            width: 23px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%,-50%);
+                    transform: translate(-50%,-50%);
+        }
+        .btn_box .btn_box_text{
+            display: block;
+            text-align: center;
+            line-height: 48px;
+            color: #FFF;
+        }
+        .btn_box.pull-left{
+            background: url(../image/webview_dividing.png) right center no-repeat;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .btn_box.pull-left:active,.btn_box.pull-left.tap-active{
+            background: #7F0000 url(../image/webview_dividing.png) right center no-repeat;
+            background-size: 1px 100%;
+        }
+        .search_box{
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            background: url(../image/tmall_search_result_input.png) center center no-repeat;
+            background-size: 100% 39px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .search_box .home_icon_search {
+            float: left;
+            height: 100%;
+            width: 37px;
+            background: url(../image/tmall_icon_search.png) center center no-repeat;
+            background-size: 18px 18px;
+        }
+        .search_box .text {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            /*text-indent: 37px;*/
+            padding-left: 37px;
+            font-size: 0.9em;
+            -webkit-transform: translateY(-50%);
+                    transform: translateY(-50%);
+        }
+        .btn_box.pull-right{
+            background: url(../image/webview_dividing.png) left center no-repeat;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .btn_box.pull-right:active,.btn_box.pull-right.tap-active{
+            background: #7F0000 url(../image/webview_dividing.png) left center no-repeat;
+            background-size: 1px 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="header">
+            <div class="btn_box pull-left" tapmode="tap-active" onclick="api.closeWin()">
+                <img src="../image/arrow_grey_left_pressed.png" alt="">
+            </div>
+            <div class="search_box" >
+                <i class="home_icon_search"></i>
+                <input type="text" id="findstr" placeholder="请输入要查找的内容..." class="text">
+            </div>
+            <div class="btn_box pull-right" tapmode="tap-active" onclick="SubsidiaryNoticechangeSearch()">
+                <span class="btn_box_text">搜索</span>
+            </div>
+        </div>
+
+    </div>	
+</body>
+<script type="text/javascript">
+	apiready = function(){
+
+	};
+	
+    function SubsidiaryNoticechangeSearch()
+    {		
+    		var findstr=$api.byId('findstr').value;
+	        api.execScript({
+	            name: 'SubsidiaryNoticeList_win',
+	            frameName: 'SubsidiaryNoticeList_frm',
+	            script: 'SubsidiaryNoticechangeSearchResult("'+findstr+'");'
+        	});
+        	//关闭搜索界面
+        	api.closeWin();
+    };
+</script>
+</html>

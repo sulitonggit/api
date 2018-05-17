@@ -1,0 +1,476 @@
+<!doctype html>	
+<html>	
+<head>	
+    <meta charset="utf-8">	
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>	
+    <title>EIPHome</title>	
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />	
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />	
+    <style>	
+        html,body{
+        height: 100%;
+   		 }
+    	#footer {	
+    		height: 56px;	
+			line-height: 55px;	
+			background-color: #0883D9;	
+			width: 100%;
+			text-align: center;
+    	}
+	    #wrap{
+	        height: 100%;
+	        display: -webkit-box;
+	        -webkit-box-orient: vertical;
+	        -webkit-flex-flow: column;
+	    }
+	    #main{
+	        -webkit-box-flex: 1; 
+	        -webkit-flex: 1;
+	    }
+		.bar_item_hover {	
+			background:#000;	
+		}	
+		.topbar {background: #0883D9; height:50px; border-bottom: 0px solid #DDDFE3;}	
+		.btn_click {background: #DADDE0;}	
+		.topbar_title {display: inline-block;font-size: 20px; line-height: 50px;padding-left: 12px;}	
+		.scrollbar {display: -webkit-box;display: -webkit-flex;display: flex; text-align: center; height: 40px; line-height: 40px;background: #EBECF0;font-size: 12px;position: relative;}	
+		.flex1 {-webkit-box-flex:1;-webkit-flex: 1;flex:1;color: #909090;}	
+		.indexbar {position: absolute;width: 50%;height: 5px;left: 0px;bottom: 0px;-webkit-transition: 300ms;}	
+		.redbox {background: #DB4646;width: 40px;height: 5px;position: relative;left: auto;right: auto; margin-left: auto; margin-right: auto;}	
+	
+		/*推荐头部*/	
+		.right_btn{float: right;padding: 11px 15px 11px 15px;}	
+		#logo {padding: 11px 0 0 10px;height: 28px;}	
+		#topbar_profile {height: 28px;}	
+		#topbar_search {height: 28px;} 	
+			
+		.titlebar {display: none;}	
+		.activebar {display: block;}	
+		.bottomhover {background-color: #46494B;}	
+		/* 热点头部 */	
+		#topbar_refresh {width: 40px;padding:5px 10px;}	
+		/* 本地刷新图标 */	
+		#localrefresh {display:none;float: right; width: 40px; padding: 5px 10px;}
+
+		#footer_list{
+		    height: 50px;
+		    width: 100%;
+		    position: relative;
+		}
+		#footer_list .list_li{
+		    float: left;
+		    height: 55px;
+		    width: 25%;
+		    position: relative;
+		}
+		#footer_list .list_bar{
+		    position: absolute;
+		    bottom: 0;
+		    left: 0%;
+		    height: 2px;
+		    width: 25%;
+		    -webkit-transform: translateX(0%);
+		            transform: translateX(0%);
+		    -webkit-transition: all .25s ease;
+		            transition: all .25s ease;
+		
+		}
+		#footer_list .list_bar .list_bar_inner{
+		    position: absolute;
+		    width: 50%;
+		    height: 100%;
+		    top: 0;
+		    left: 50%;
+		    background-color: #C50000;
+		    -webkit-transform: translateX(-50%);
+		            transform: translateX(-50%);
+		}
+		#footer_list .home{
+		    background: url(../image/bottombtn0101new.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .home.active{
+		    background: url(../image/bottombtn0102.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .follow{
+		    background: url(../image/bottombtn0201new.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .follow.active{
+		    background: url(../image/bottombtn0202.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .fun{
+		    background: url(../image/bottombtn0301new.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .fun.active{
+		    background: url(../image/bottombtn0302.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .cart{
+		    background: url(../image/bottombtn0401new.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+		#footer_list .cart.active{
+		    background: url(../image/bottombtn0402.png) center 4px no-repeat;
+		    background-size: 33px;
+		}
+
+		#footer_list .list_li .text{
+		    position: absolute;
+		    width: 100%;
+		    height: 1em;
+		    line-height: 1em;
+		    left: 0;
+		    bottom: 7px;
+		    color: #FFFFFF;
+		    font-size: 12px;
+		}
+		#footer_list .list_li.active .text{
+		    color: #FFFFFF;
+		}
+
+    	#header
+    	{	
+    		height: 56px;	
+			line-height: 55px;	
+			background-color: #0883D9;	
+			width: 100%;
+			text-align: center;
+    	}
+		#header_list{
+		    height: 50px;
+		    width: 100%;
+		    position: relative;
+		}
+		#header_list .list_li{
+		    float: left;
+		    height: 55px;
+		    width: 25%;
+		    position: relative;
+
+		}
+		
+		#header_list .list_li .text
+		{
+		    width: 100%;
+		    height: 1em;
+		    line-height: 1em;
+		    left: 0;
+		    bottom: 5px;
+		    color: #FFFFFF;
+		    font-size: 16px;
+		} 
+		#header_list .list_li.active
+		{
+			background:#022A65;
+			height:100%;
+		} 		
+		.swipe {	
+			width: 100%;	
+	        background-color: #0883D9;	
+	        overflow: hidden;	
+	        position: relative;	
+	        padding-bottom: 0px;
+	    }	
+	    .swipe-wrap {	
+	        overflow: hidden;	
+	        position: relative;	
+	        padding-top: 0px;
+	    }	
+	    .swipe-wrap .swipe-box {	
+	        float: left;	
+	        width: 100%;	
+	        position: relative;	
+	    }	
+		.swipe-box img{	
+			width:100%;
+		}	
+				
+    </style>	
+</head>	
+<body>	
+    <div id="wrap">	
+		<!-- 推荐头部 -->	
+        <div id="recommandTitle" class="titlebar activebar">	
+            <div class="topbar" align="center">	
+                <img src="../image/logo-darkNew.png" alt="" id="logo">	
+                <img src="../image/topbar_profile.png" alt="" class="right_btn" id="topbar_profile"   tapmode="btn_click" onclick="openpersoninfo()">	
+              <!--  <img src="../image/topbar_search.png" alt="" class="right_btn" id="topbar_search"  tapmode="btn_click" onclick="closelogin2()"> -->
+            </div>
+			<div id="swipe" class="swipe">	
+				<div class="swipe-wrap">	
+					<div class="swipe-box"> 	
+						<img src="https://smartforms.sailunjinyu.com/eipmobile/image/api_1.png" alt="">
+					</div>
+					<div class="swipe-box"> 	
+						<img src="https://smartforms.sailunjinyu.com/eipmobile/image/api_2.png" alt="">
+					</div>
+					<div class="swipe-box"> 	
+						<img src="https://smartforms.sailunjinyu.com/eipmobile/image/api_3.png" alt="">
+					</div>
+					<div class="swipe-box"> 	
+						<img src="https://smartforms.sailunjinyu.com/eipmobile/image/api_4.png" alt="">
+					</div>										
+				</div>
+			</div>
+
+			<div id="header">	
+		       <ul id="header_list">	
+		        	<li class="list_li active" tapmode="bottomhover" onclick="changeIndexFrame(0)">	
+		        		<span class="text">流程管理</span>
+		        	</li>	
+		        	<li class="list_li" tapmode="bottomhover" onclick="changeIndexFrame(1)">	
+		        		<span class="text">任务管理</span>
+		        	</li>	
+		        	<li class="list_li" tapmode="bottomhover" onclick="changeIndexFrame(2)">	
+		        		<span class="text">文件管理</span>
+		        	</li>	
+		        	<li class="list_li" tapmode="bottomhover" onclick="changeIndexFrame(3)">	
+		        		<span class="text">辅助办公</span>
+		        	</li>
+		        </ul>
+	        </div>
+        </div>
+	
+        <div id="main">	
+                	
+        </div>	
+        <div id="footer">	
+	       <ul id="footer_list">	
+	        	<li class="list_li home active" tapmode="bottomhover" onclick="">	
+	        		<span class="text">首页</span>
+	        	</li>	
+	        	<li class="list_li follow " tapmode="bottomhover" onclick="openother()">	
+	        		<span class="text">其他</span>
+	        	</li>	
+	        	<li class="list_li fun" tapmode="bottomhover" onclick="openreport()">	
+	        		<span class="text">报表</span>
+	        	</li>	
+	        	<li class="list_li cart" tapmode="bottomhover" onclick="opensetting()">	
+	        		<span class="text">设置</span>
+	        	</li>
+	        </ul>
+        </div>
+    </div>	
+</body>	
+<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/swipe.js"></script>
+<script tyle="text/javascript" src="../script/layer/layer.js"></script>
+<script type="text/javascript">
+
+	var badge=localStorage.getItem('badge');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	
+	window.onload = function() {	
+		//var li = $api.domAll('.title-box-ul li');	
+		var mySwiper = Swipe($api.byId('swipe'),{	
+			auto:3000,	
+			continuous: true,	
+			/*callback: function(index,elem) {	
+                var i = li.length;	
+                while (i--) {	
+                    li[i].className = '';	
+                }	
+                li[index].className = 'active';	
+            }*/	
+		});	
+	}
+	
+    apiready = function()
+    {
+
+    	api.removeLaunchView();//去掉加载页面，放在主界面
+		api.addEventListener({
+                        name:'keyback'
+                    	},function(ret,err){
+                    	//coding...
+                    	api.closeWidget({});
+                    });
+                    
+		var recommandheader = $api.byId('recommandTitle');	
+        $api.fixIos7Bar(recommandheader);
+        var recommandbox = $api.offset(recommandheader);	
+        var main = $api.byId('main');	
+        var mainPos = $api.offset(main);	
+		var footer = $api.byId('footer');	
+		var footerPos = $api.offset(footer);	
+
+		//加载公告
+		api.ajax({
+			url: serverurl,
+			method: 'get',
+			data: {values: {k:'checkAnnouncement',Badge:badge}}
+		}, function(ret, err) 
+		{
+			if (ret) 
+			{
+				if(ret.state == '1')
+				{
+				
+					//iframe层
+					layer.open({
+						type: 2,
+						title: '公告',
+						shadeClose: true,
+						shade: 0.8,
+						area: ['auto', '90%'],
+						content: [ret.url], //iframe的url
+						//关闭公告，加载数据
+						end: function(index)
+						{
+							//关闭的时候记录关闭状态
+							api.ajax({
+	                            url:serverurl,
+	                            method: 'post',
+	                            dataType:'text',
+	                            data: {values: {k:'UpdateAnnouncement',Badge:badge}}
+                            },function(ret,err)
+                            {
+								layer.close(index);
+								openFrameGroup(recommandbox,footerPos);
+                            });
+						}
+					});
+				}
+				else
+				{
+					openFrameGroup(recommandbox,footerPos);
+				}
+				//
+			} 
+			else 
+			{
+				api.alert({ msg: JSON.stringify(err) });
+			}
+		});
+		        
+		/*api.openFrame ({	
+	        name: 'Home_frame1',	
+	        url: 'Home_frame0.html',	
+	        rect:{	
+	            x:0,	
+	            y:recommandbox.h,	
+	            w:'auto',	
+	            h:api.frameHeight-recommandbox.h -footerPos.h	
+	        },	
+	        pageParam: {name: 'test'},	
+	        bounces: false,	
+	        opaque: false,	
+	        bgColor: 'rgba(70 , 70, 70,0)',	
+	        vScrollBarEnabled:true,	
+	        hScrollBarEnabled:true	
+	    });*/
+	    
+    };
+    
+    function openFrameGroup(recommandbox,footerPos)
+    {
+ 		api.openFrameGroup({
+	        name: 'homegroup',
+	        background: '#FFF',
+			scrollEnabled: false,
+			rect:{	
+	            x:0,	
+	            y:recommandbox.h,	
+	            w:'auto',	
+	            h:api.frameHeight-recommandbox.h -footerPos.h	
+	        },
+	        index: 0,
+	        frames:
+            [{
+                name: 'workflowframe', 
+                url: 'Home_frame0.html', 
+                bounces:false, 
+                opaque:false,
+                bgColor: '#FFF'
+            },{
+                name: 'taskframe', 
+                url: 'Home_frame1.html', 
+                bounces:false, 
+                opaque:false,
+                bgColor: '#FFF'
+            },{
+                name: 'folderframe', 
+                url: 'Home_frame2.html', 
+                bounces:false, 
+                opaque:false,
+                bgColor: '#FFF'
+            },{
+                name: 'officeframe', 
+                url: 'Home_frame3.html', 
+                bounces:false, 
+                opaque:false,
+                bgColor: '#FFF'
+            }]
+        },function(ret,err){
+        	//coding...
+        });   
+    }
+	//打开设置页面
+    function opensetting()
+   	{
+   		api.openWin({
+   				slidBackEnabled:false,
+               name: 'setting',
+               url: 'setting_window.html'
+           });
+   	};	
+   	
+   	//打开个人信息
+   	function openpersoninfo()
+   	{
+   		api.openWin({
+   				slidBackEnabled:false,
+               name: 'personinfo',
+               url: 'personinfo.html'
+           });
+   	};
+   	//打开其他信息
+   	function openother()
+   	{
+   		api.openWin({
+   				slidBackEnabled:false,
+               name: 'Other_window',
+               url: 'Other_window.html'
+           });
+   	}; 
+   	//打开报表
+   	function openreport()
+   	{
+   		api.openWin({
+				slidBackEnabled:false,
+				name: 'Reportlist_win',
+				url: 'Reportlist_win.html'
+           });
+   	}; 
+   	//打开各界面
+   	function changeIndexFrame(index)
+   	{
+   		var eHeaderLis = $api.domAll('#header_list .list_li')
+
+        for (var i = 0; i < 4; i++) 
+        {
+            if (i == index) 
+            {
+            	
+            	//alert($api.val(eHeaderLis[index]));
+                $api.addCls(eHeaderLis[index],'active');
+            } 
+            else
+            {	
+            	//alert($api.val(eHeaderLis[index]));
+                $api.removeCls(eHeaderLis[i],'active');
+            }
+        }
+           		
+        api.setFrameGroupIndex({
+            name: 'homegroup',
+            index: index
+        });
+   	};     
+</script>	
+</html>	

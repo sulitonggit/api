@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>EIP Moblie</title>
+    <script type="text/javascript" src="./script/api.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+
+    <style type="text/css">
+	    html,body{
+	        height: 100%;
+	        background: url(./launch/launch1080x1920.png) no-repeat;
+	        background-size: 100%;
+	        display: flex;
+	    }
+	    #wrap{
+	        height: 100%;
+	        display: -webkit-box;
+	        display: -webkit-flex;
+	        display: flex;
+	        -webkit-box-orient: vertical;
+	        -webkit-flex-flow: column;
+	               flex-flow: column;
+	    }
+	    #header{
+	        text-align: center; background-color: #0883D9; color: #fff;
+	        width: 100%;
+	    }
+	    #header h1{
+	        font-size: 20px; height: 44px; line-height: 44px; margin: 0em; color: #fff;
+	    }
+	    #main{
+	        -webkit-box-flex: 1; 
+	        -webkit-flex: 1;
+	        flex: 1;
+	    }
+	    #footer{
+	        height: 30px; line-height: 30px;
+	        background-color: #0883D9; 
+	        width: 100%;
+	        text-align: center;
+	    }
+	    #footer h5{
+	        color: white;
+	    }
+	    .con{font-size: 28px; text-align: center;}
+
+    </style>
+
+</head>
+<body>
+    <div id="wrap">
+        <div id="header">
+        </div>
+        <div id="main">
+		<h1 align="center"></h1>
+        </div>
+        <div id="footer">
+
+        </div>
+    </div>
+
+</body>
+<script type="text/javascript">
+//				debugger;
+//  apiready 
+    window.onload= function()
+    {
+    	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/Login.ashx";
+		//console.log("Hello APICloud");
+        var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+				debugger;
+        $api.fixIos7Bar(header);
+        var headerH = $api.offset(header).h;
+		var footerH = 30;
+		var frameH = api.winHeight - headerH - footerH;
+		var LoginDate = localStorage.getItem('LoginDate');
+		var CurrentDate = new Date();
+		var autologin='';
+		var username=localStorage.getItem('username');
+		var badge = localStorage.getItem('badge');
+		
+		//显示加载条
+		api.showProgress({});
+		//从服务器获取数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'text',
+			data: {values:{k: 'AutoLoginCheck', ADAccount: badge}}
+	        
+        },function(ret,err)
+        {
+			debugger;
+        	if (ret)
+        	{
+        		//alert(ret);
+        		if (ret=='ok')
+        		{
+				debugger;
+		        	api.openWin({
+		                name: 'EIPHome',
+		                url: 'html/Home_window.html'
+	                });
+        		}
+				else
+				{
+					localStorage.clear();
+					
+					api.openWin({
+					slidBackEnabled :false,
+			        name: 'login',
+			        url: 'html/login.html',
+			        //reload:true
+		        	});
+				}
+				///隐藏加载
+				api.hideProgress();       		
+        	}
+        	else 
+        	{
+         		api.alert({msg:JSON.stringify(err)});
+         		api.hideProgress();
+         	}
+        });
+        
+		//用户名存在,登录时间不超过14天的直接进入主界面
+/*		if (String(localStorage.getItem('username')) != "null" && (CurrentDate-LoginDate)/1000/60/60/24<=14) 
+		{
+	        	api.openWin({
+	                name: 'EIPHome',
+	                url: 'html/Home_window.html'
+                });
+	        	
+		}
+		else//用户名不存在或者登录超过14天或者存储的用户名和密码无法通过域验证的到登录界面
+		{
+			//alert("aaaa");
+			localStorage.clear();
+			//localStorage.removeitem("password");
+			//localStorage.removeitem("LoginDate");
+			
+			api.openWin({
+			slidBackEnabled :false,
+	        name: 'login',
+	        url: 'html/login.html',
+	        //reload:true
+        	});
+        	
+		}*/
+
+    };
+</script>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+
+	apiready = function(){
+	    //var header = $api.byId('header');
+        //$api.fixStatusBar(header);
+        //var headerH = $api.offset(header).h;
+		
+		var username=localStorage.getItem('username');
+		
+		var _url ='https://smartforms.sailunjinyu.com/eipmobile/normal.ashx?k=GetVersionList&ADAccount='+username;
+		
+		api.showProgress({});
+		api.ajax(
+		{
+	        url: _url,
+	        method: 'post',
+	        dataType:'json',
+	        timeout : 30
+        },function(ret,err)
+        {
+        	//coding...
+			if (ret) 
+			{
+				var item=[];
+				for(var idx in ret)
+				{
+	                item[idx] = ret[idx];
+	            }
+				var UIListView = api.require('UIListView');
+				UIListView.open({
+				    rect: {
+				        x: 0,
+				        y: 0,
+				        w: api.winWidth,
+				        h: api.frameHeight
+				    },
+				    data: ret,
+				    styles: {
+				        borderColor: '#696969',
+				        item: {
+				            bgColor: '#FFFFFF',
+				            activeBgColor: '#F5F5F5',
+				            height: 55.0,
+				            imgWidth: 40,
+				            imgHeight: 40,
+				            imgCorner: 4,
+				            placeholderImg: '',
+				            titleSize: 12.0,
+				            titleColor: '#000',
+				            subTitleSize: 12.0,
+				            subTitleColor: '#000', 
+				            remarkColor: '#000',
+				            remarkSize: 16,
+				            remarkIconWidth: 30
+				        }
+				    },
+				    fixedOn: api.frameName
+				}, function(ret, err)
+				{
+				    if( ret )
+				    {
+				         //alert( JSON.stringify( ret ) );
+						if(ret.eventType =='show' )
+						{
+			    			//alert( 'show' );
+			    		}
+			    		else
+			    		{
+			    			api.openWin({
+	                            name: 'versionshow',
+	                            url: 'versionshow_win.html',
+	                            pageParam: {URL:item[ret.index].URL}
+                            });
+			    		}
+				    }
+				    else
+				    {
+				         //alert( JSON.stringify( err ) );
+				    }
+				});
+		    } 
+		    else 
+		    {
+		         api.alert({msg:JSON.stringify(err)});
+		         api.hideProgress();
+		    }
+		    
+		    api.hideProgress();
+        });
+	};
+
+</script>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>EIP移动办公</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+
+    <link rel="stylesheet" href="../css/jquery.mobile-1.4.5.min.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../script/jquery.mobile-1.4.5.min.js"></script>
+
+    <style>
+    	body{
+
+    	}
+    </style>
+		<script type="text/javascript">
+
+		</script>
+</head>
+<body>
+	<div data-role="page" id="Loginpage">
+		<div data-role="header" data-position="fixed" style="text-align: center;">
+	        <img src="../image/logo.png" alt="logo" style="height: 50px;" />
+		</div>
+	    <div data-role="content" id="homeContent">
+            <label for="userdomain">公 司 域</label>
+            <select id="userdomain" data-native-menu="false" data-mini="true">
+                <option value="SAILUNJINYU">SAILUNJINYU</option>
+                <option value="JINYUTYRES">JINYUTYRES</option>
+                <option value="JINYUTIRES">JINYUTIRES</option>
+                <option value="SAILUNTYRE">SAILUNTYRE</option>
+                <option value="SVTYRE">SVTYRE</option>
+                <option value="PEACEDOVETYRE">PEACEDOVETYRE</option>
+                <option value="SAILUNGROUP">SAILUNGROUP</option>
+                <option value="0">工号登陆</option>
+            </select>
+            <br />
+            <label for="username">用 户 名</label>
+            <input type="text" id="username" name="username" placeholder="请输入用户名" data-mini="true" />
+            <span></span>
+            <br />
+            <label for="userpassword" data-mini="true" >密    码</label>
+            <input type="password" id="userpassword" name="userpassword" placeholder="请输入密码 " data-mini="true" />
+            <span></span>
+            <br />
+            <label for="autologindate">自动登录时间</label>
+            <select id="autologindate" data-native-menu="false" data-mini="true">
+                <option value="0">0</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="60">60</option>
+            </select>
+            <br />
+            <input type="button" value="登 录" data-mini="true" id="btnSubmit" onclick="login()"/>
+            <br />
+            <a href="" onclick="OpenChangePwd()">忘记密码</a><!--onclick="OpenChangePwd()"-->
+	    </div>
+	    <div data-role="footer" data-position="fixed">
+			<h3>版权@2016</h3>
+	    </div>
+    </div>
+</body>
+<script type="text/javascript">
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/Login.ashx";
+
+	function login()
+	{
+		var domain = $("#userdomain  option:selected").val();
+		var condition = $("#userdomain option:selected").val();
+		var username = domain+"\\"+$('#username').val();
+        var password = $('#userpassword').val();
+        var LoginDate = new Date();
+        var AutoLoginDate = $("#autologindate  option:selected").text();
+        var alias=domain+$('#username').val();
+    	//显示加载条
+		api.showProgress({});
+		//从服务器获取数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'json',
+			data: {
+				values:{
+					k: 'login',
+					username: username,
+					password: password,
+					AutoLoginDate:AutoLoginDate,
+					EquipmentType:api.systemType,
+					condition: condition,
+					appVersion:api.appVersion
+					}
+				}
+
+        },function(ret,err)
+        {
+        	//如果返回成功返回结果
+        	if (ret)
+        	{
+        		if (ret.status != 0)
+        		{
+					localStorage.setItem('username',ret.username);
+					localStorage.setItem('badge', ret.badge);
+					localStorage.setItem('password',password);
+					localStorage.setItem('LoginDate',LoginDate);
+					localStorage.setItem('alias',alias);
+					//进入首页
+		        	api.openWin({
+		                name: 'EIPHome',
+		                url: '../html/Home_window.html'
+	                });
+
+        		}
+				else
+				{
+					alert(ret.err_message);
+				}
+				///隐藏加载
+				api.hideProgress();
+        	}
+        	else
+        	{
+         		api.alert({msg:JSON.stringify(err)});
+         		api.hideProgress();
+         	}
+        });
+	}
+
+    apiready = function()
+    {
+		//api.removeLaunchView();//去掉加载页面，放在主界面
+		api.addEventListener({
+                        name:'keyback'
+                    	},function(ret,err){
+                    	//coding...
+                    	api.closeWidget({});
+                    });
+    };
+
+	//忘记密码
+	function OpenChangePwd()
+	{
+		window.location.href = "ChangePwd.html";
+//		api.openWin({
+//	        name: 'ChangePwd',
+//	        url: 'ChangePwd.html'
+//      });
+	};
+</script>
+</html>

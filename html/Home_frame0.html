@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+  <title>frame</title>
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" type="text/css" href="../css/api.css" />
+	<style>
+		html {width: 100%;height: 100%;background: #FFF;}
+		body {background: #FFFFFF;width: 100%;/*height: 100%;*/}
+		.recommand_card {
+			box-sizing:border-box;
+			-webkit-box-sizing:border-box;
+			float: left;
+			width: 33%;
+			padding-left: 5px;
+			padding-right: 5px;
+			text-align: center;
+			font-size: 12px;
+			margin-bottom: 10px;
+		}
+		.recommand_card img {width: 100%;}
+		.subtitle {
+			padding-left: 5px;
+			padding-bottom: 5px;
+			font-size: 14px;
+			font-weight: bold;
+			background:#0883D9;
+			height:50px;
+			border-bottom: 0px solid #0883D9;
+			box-sizing:border-box;
+			-webkit-box-sizing:border-box;
+			margin-bottom: 10px;
+			margin-left: 5px;
+			margin-right: 5px;
+
+		}
+		#mydolist {padding: 0px 0 0 0px;height: 50px;}
+		.right_btn{
+			float: right;
+			padding: 11px 15px 11px 15px;
+			height: 28px;
+		}
+		.WFMyDoListNumshow{
+			float:right;
+			color:#FFFFFF;
+			margin-right: 50px;
+			margin-top: 15px;
+		}
+
+		.WFMyDoListNumshow, .StartWFsshow{
+			float:right;
+			color:#FFFFFF;
+			margin-right: 50px;
+			margin-top: 15px;
+		}
+		.StartWFsshow{
+		  margin-right: 80px;
+		}
+
+
+		.divider {height: 10px;clear: both;}
+		.innerCard {background: #fff;}
+		.videotitle {
+			padding-bottom: 4px;
+			padding-left: 5px;
+		}
+		.tvshow_row {height: 137px;}
+		.tvshow_row .innerCard{text-align: left;position: relative;}
+		.videosubtitle {font-size: 10px; color: #909090;padding-left: 5px;padding-bottom: 5px;}
+		.update {position: absolute; bottom: 45px; margin-left: 5px; color: #fff;}
+		.card_hover {background: #0f0;}
+		/* 图片轮播样式 */
+		.pagination {position: absolute; z-index: 20; right: 10px; bottom: 10px; }
+		.swiper-pagination-switch {display: inline-block; width: 8px; height: 8px; border-radius: 8px; background: #555; margin-right: 5px; opacity: 0.8; border: 1px solid #fff; cursor: pointer; }
+		.swiper-active-switch {background: #fff; }
+
+
+		.swipe {
+			width: 100%;
+	        background-color: #0883D9;
+	        overflow: hidden;
+	        position: relative;
+	        padding-bottom: 0px;
+	    }
+	    .swipe-wrap {
+	        overflow: hidden;
+	        position: relative;
+	        padding-top: 0px;
+	    }
+	    .swipe-wrap .swipe-box {
+	        float: left;
+	        width: 100%;
+	        position: relative;
+	    }
+		.swipe-box img{
+			width:100%;
+		}
+		.swipe .title-box {
+			width:100%;
+			position: relative;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="swipe" class="swipe">
+		<div class="swipe-wrap">
+			<div class="swipe-box">
+				<!--<img src="../image/api_2new.png" alt="">-->
+			</div>
+		</div>
+	</div>
+	<div class="divider"></div>
+	<div class="subtitle" onclick="OpenMyDoList()">
+		<img src="../image/mydolist.png" alt="" id="mydolist">
+		<img src="../image/arrow_grey_right_pressed.png" class="right_btn">
+		<div class="WFMyDoListNumshow" id="WFMyDoListNum" >您有0条待办流程</div>
+	</div>
+	<ul class="recommand_row">
+		<li class="recommand_card" tapmod="card_hover" onclick="OpenMyApplyList()">
+			<div class="innerCard">
+				<img src="../image/fwmyapplynew.png" alt="">
+			</div>
+		</li>
+		<li class="recommand_card"  tapmod="card_hover" onclick="OpenMyDealList()">
+			<div class="innerCard">
+				<img src="../image/wfmydonew.png" alt="">
+			</div>
+		</li>
+		<li class="recommand_card"  tapmod="card_hover" onclick="OpenMyCCList()">
+			<div class="innerCard">
+				<img src="../image/fwmycc.png" alt="">
+
+			</div>
+		</li>
+	</ul>
+	<div style="clear:both"></div>
+	<div class="subtitle" onclick="openStartWFList()">
+        <img src="../image/start_apply.png" alt="" id="sendwf">
+        <img src="../image/arrow_grey_right_pressed.png" class="right_btn">
+        <div class="StartWFsshow" id="StartWFs">发起流程</div>
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/swipe.js"></script>
+<script>
+	var username=localStorage.getItem('username');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	var MyDoListNum=[];
+	var alias=localStorage.getItem('alias').toUpperCase();
+
+	window.onload = function()
+	{
+		var li = $api.domAll('.title-box-ul li');
+		var mySwiper = Swipe($api.byId('swipe'),{
+			auto:3000,
+			continuous: true,
+			callback: function(index,elem) {
+                var i = li.length;
+                while (i--) {
+                    li[i].className = '';
+                }
+                li[index].className = 'active';
+            }
+		});
+	}
+	apiready = function ()
+	{
+
+		//使用极光推送
+
+		var jpush = null;
+		//初始化推送
+		jpush = api.require('ajpush');
+		jpush.init(function(ret)
+		{
+			if(ret && ret.status)
+			{
+				//alert('极光推送初始化操作成功!');
+			}
+			else
+			{
+				//alert('极光推送初始化操作失败!');
+			}
+		});
+
+		jpush.bindAliasAndTags(
+		{
+			alias:alias,
+			tags:alias
+		}, function(ret, err)
+		{
+			//alert('处理结果：\n' + JSON.stringify(ret));
+			//alert(alias);
+		});
+		jpush.setListener(
+		    function(ret)
+		    {
+		         var id = ret.id;
+		         var title = ret.title;
+		         var content = ret.content;
+		         var extra = ret.extra;
+		    }
+		);
+
+		//获取各待办数据
+		api.showProgress({});
+
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'json',
+			data: {values:{k:'GetMyDoListNum',username:username}}
+        },function(ret,err)
+        {
+			if (ret)
+			{
+				for(var idx in ret)
+				{
+					//MyDoListNum[idx] = ret[idx];
+					if(ret[idx].ModuleName=='WFMyDoList')
+					{
+						document.getElementById ("WFMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办流程';
+					}
+	            }
+
+				///隐藏加载
+				api.hideProgress();
+			}
+			else
+        	{
+         		api.alert({msg:JSON.stringify(err)});
+         		api.hideProgress();
+        	}
+        });
+
+		api.setRefreshHeaderInfo(
+		{
+			visible: true,
+			bgColor: 'rgba(0,0,0,0)',
+			textColor: '#666',
+			textDown: '下拉刷新',
+			textUp: '释放刷新'
+		}, function(ret, err)
+		{
+			//获取各待办数据
+			api.showProgress({});
+
+			api.ajax({
+				url:serverurl,
+		        method: 'post',
+		        dataType:'json',
+				data: {values:{k:'GetMyDoListNum',username:username}}
+	        },function(ret,err)
+	        {
+				if (ret)
+				{
+					for(var idx in ret)
+					{
+						//MyDoListNum[idx] = ret[idx];
+						if(ret[idx].ModuleName=='WFMyDoList')
+						{
+							document.getElementById ("WFMyDoListNum").innerHTML = '您有'+ret[idx].Num+'条待办流程';
+						}
+		            }
+
+					///隐藏加载
+					api.hideProgress();
+				}
+				else
+	        	{
+	         		api.alert({msg:JSON.stringify(err)});
+	         		api.hideProgress();
+	        	}
+	        });
+		    api.refreshHeaderLoadDone();
+		});
+
+	};
+	///流程待办列表
+	function OpenMyDoList()
+	{
+		api.openWin({
+	        name: 'WFMyDoList',
+	        url: 'WFMyDoList_win.html'
+        });
+	};
+	//流程我的申请
+	function OpenMyApplyList()
+	{
+		api.openWin({
+	        name: 'WFMyApplyList',
+	        url: 'WFMyApplyList_win.html'
+        });
+	};
+	//流程我的处理
+	function OpenMyDealList()
+	{
+		api.openWin({
+	        name: 'WFMyApprovalList',
+	        url: 'WFMyApprovalList_win.html'
+        });
+	};
+	//流程抄送
+	function OpenMyCCList()
+	{
+    api.openWin({
+	        name: 'WFMyCCList',
+	        url: 'WFMyCCList_win.html'
+        });
+	};
+	//我的待办任务
+	function OpenTaskMyDoList()
+	{
+		api.openWin({
+	        name: 'TaskMyDoList',
+	        url: 'TaskMyDoList_win.html'
+        });
+	};
+	//我申请的任务
+	function OpenMyApplyTaskList()
+	{
+		api.openWin({
+	        name: 'TaskMyApplyList',
+	        url: 'TaskMyApplyList_win.html'
+        });
+	};
+	//我处理的任务
+	function OpenMyDealTaskList()
+	{
+		api.openWin({
+	        name: 'TaskMyApprovalList',
+	        url: 'TaskMyApprovalList_win.html'
+        });
+	};
+	//我参与的任务
+	function OpenMyJoinTaskList()
+	{
+		alert('暂未开放，请等待后续更新！');
+	};
+	//发起流程
+	function openStartWFList() {
+	   api.openWin({
+	       name: 'WFStartApply',
+	       url: 'WFStartApply_win.html'
+       });
+	}
+</script>
+</html>

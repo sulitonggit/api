@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div id='form' class="container-fluid">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var username=localStorage.getItem('username');
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	var inputGroupStr="";
+
+	apiready = function()
+	{
+		
+        //显示加载动画
+		api.showProgress({});
+		//获取流程节点数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'text',
+			data: {values:{k:'GetMyLoginList',username:username}}
+	        
+        },function(ret,err)
+        {
+        	if (ret)
+        	{
+        		document.getElementById ("form").innerHTML = ret;
+        		api.hideProgress();
+        	}
+        	else
+        	{
+        		api.alert({msg:JSON.stringify(err)});
+        		api.hideProgress();
+        	}
+        });
+	};
+
+</script>
+</html>

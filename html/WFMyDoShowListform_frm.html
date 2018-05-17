@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css' />
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id='form' class="container-fluid">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var username = localStorage.getItem('username');
+    var FormID = "";
+    var ActivityName = "";
+    var NodeName = "";
+    var serverurl = "https://smartforms.sailunjinyu.com/eipmobile/workflow.ashx";
+    var AttachmentListView;
+    var AttachmentList = [];
+    var dmg;
+    var handle_id = '';
+
+    // 防止死锁，每个打开的都清空一下
+    clearInterval();
+
+    apiready = function() {
+        FormID = api.pageParam.FormID;
+        ActivityName = api.pageParam.ActivityName;
+        NodeName = api.pageParam.NodeName;
+        dmg = api.require('downloadManager');
+        //显示加载动画
+        api.showProgress({});
+        //获取流程节点数据
+        api.ajax({
+            url: serverurl,
+            method: 'post',
+            dataType: 'json',
+            data: {
+                values: {
+                    k: 'CreateMoblieNodeShowtAttachmentList',
+                    ADAccount: username,
+                    FormID: FormID,
+                    NodeName: NodeName,
+                    ActivityName: ActivityName
+                }
+            }
+
+        }, function(ret, err) {
+            api.hideProgress();
+            //console.log(ret.length);
+            if (ret && ret.length > 0) {
+                AttachmentList = ret;
+                AttachmentListView = api.require('UIListView');
+                AttachmentListView.open({
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: api.frameHeight
+                    },
+                    data: ret,
+                    rightBtns: [{
+                        bgColor: '#0883D9',
+                        activeBgColor: '',
+                        width: 70,
+                        title: '预览',
+                        titleSize: 12,
+                        titleColor: '#fff',
+                        icon: '',
+                        iconWidth: 20
+                    }],
+                    styles: {
+                        borderColor: '#696969',
+                        item: {
+                            bgColor: '#F5F5F5',
+                            activeBgColor: '#CCC',
+                            height: 55.0,
+                            imgWidth: 32,
+                            imgHeight: 32,
+                            imgCorner: 0,
+                            placeholderImg: '',
+                            titleSize: 12.0,
+                            titleColor: '#000',
+                            subTitleSize: 12.0,
+                            subTitleColor: '#000',
+                            remarkColor: '#000',
+                            remarkSize: 16,
+                            remarkIconWidth: 30
+                        }
+                    },
+                    fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        if (ret.eventType == 'show') {
+                            //alert('加载成功');
+                        } else if (ret.eventType == 'clickRightBtn' && ret.btnIndex == 0) {
+                            var view_url = AttachmentList[ret.index].ViewUrl;
+                            api.openWin({
+                                name: 'WFMyDoAttachmentshow_win',
+                                url: 'WFMyDoAttachmentshow_win.html',
+                                pageParam: {
+                                    ViewUrl: view_url
+                                }
+                            });
+                        } else {
+                            var DownloadUrl = AttachmentList[ret.index].DownloadUrl;
+                            var FileName = AttachmentList[ret.index].subTitle;
+                            ///开始下载内容
+                            api.showProgress();
+                            startdown(FileName, DownloadUrl);
+
+                            handle_id = setInterval(query_status, 1000);
+                            //打开下载界面
+                            //openview();
+                        }
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+            } else {
+                var msg = JSON.stringify(err);
+                api.alert({
+                    msg: msg ? msg : '没有数据'
+                });
+            }
+        });
+
+
+    };
+
+    function openview() {
+        dmg.openManagerView(onItemClick);
+    }
+
+    //点击打开文档
+    function onItemClick(ret, err) {
+        if (ret) {
+            var did = ret.id;
+            console.log('id:' + did);
+            dmg.openDownloadedFile({
+                id: did
+            });
+        }
+    }
+
+    //下载文档的id
+    var id = '';
+
+    function startdown(FileName, DownloadUrl) {
+        dmg.enqueue({
+            url: DownloadUrl,
+            savePath: 'fs://' + FileName,
+            cache: true,
+            allowResume: true,
+            title: FileName,
+            networkTypes: 'all'
+        }, function(ret, err) {
+            if (ret) {
+                id = ret.id;
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+    function query_status() {
+        dmg.query({
+            ids: [id]
+        }, function(ret, err) {
+            //0 等待下载
+            //1 正在下载
+            //2 暂停状态，等待恢复或被重新唤醒
+            //3 下载成功
+            //4 下载发生错误
+            switch (ret.data[0].status) {
+                case 2:
+                case 4:
+                    // 被暂停或者出错，到管理器界面
+                    clearInterval(handle_id);
+                    api.hideProgress();
+                    dmg.openManagerView();
+                    break;
+                case 3:
+                    clearInterval(handle_id);
+                    api.hideProgress();
+                    //打开文件
+                    dmg.openDownloadedFile({
+                        id: id
+                    }, function(ret, err) {
+                        if (!ret.status) {
+                            // 如果打开失败，跳转到下载管理器界面，手动打开
+                            dmg.openManagerView();
+                        }
+                    })
+                    break;
+            }
+        })
+    }
+</script>
+
+</html>

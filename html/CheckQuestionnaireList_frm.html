@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+</head>
+
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var serverurl = 'https://smartforms.sailunjinyu.com/eipmobile/normal.ashx';
+    //加载问卷列表
+    apiready = function() {
+        var uiListView = api.require('UIListView');
+        api.showProgress();
+
+        api.ajax({
+            url: serverurl,
+            method: 'post',
+            timeout: 30,
+            dataType: 'json',
+            data: {
+                values: {
+                    k: 'GetCheckQuestionnaireList',
+                    badge: localStorage.getItem('badge')
+                }
+            }
+        }, function(ret, err) {
+            console.log(JSON.stringify(ret));
+            api.hideProgress();
+            if (ret) {
+                //alert(JSON.stringify(ret));
+                //console.log(JSON.stringify(ret));
+                var style = {
+                    item: {
+                        bgColor: 'white',
+                        titleSize: 14,
+                    }
+                }
+
+                uiListView.open({
+                    rect: {
+                        x: 0,
+                        y: api.pageParam.h,
+                        w: api.winWidth,
+                        h: api.frameHeight
+                    },
+                    styles: style,
+                    data: ret
+                }, function(ret, err) {
+                    //点击检点问卷加载问卷内容
+                    if (ret.eventType == 'clickContent') {
+                        uiListView.getDataByIndex({
+                            index: ret.index
+                        }, function(ret, err) {
+                            //alert(JSON.stringify(ret));
+                            if (ret.data) {
+
+                                var questionnaire_id = ret.data.uid;
+                                var title = ret.data.title;
+                                var special_item = ret.data.special_item ? ret.data.special_item.replace('，', ',') : '';
+
+                                if (title.length > 10) {
+                                    title = title.substr(0, 10) + '...';
+                                }
+
+                                api.openWin({
+                                    name: 'CheckQuestionnaire_win',
+                                    url: 'CheckQuestionnaire_win.html',
+                                    pageParam: {
+                                        questionnaire_id: questionnaire_id, //问卷id
+                                        title: title,
+                                        special_item: special_item //点击该选项需要填写原因
+                                    }
+                                });
+                            } else {
+                                alert('加载失败,请退出重试');
+                            }
+                        })
+                    }
+                });
+            } else {
+                alert('请求出错,请稍后重试');
+            };
+        });
+    }
+</script>
+
+</html>

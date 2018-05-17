@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var myUICityList;
+	var username=localStorage.getItem('username');
+	var rptretlist=[];
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/normal.ashx";
+	  
+	apiready = function()
+	{
+		myUICityList = api.require('UICityList');
+        //显示加载动画
+		api.showProgress({});
+		//获取报表数据
+		api.ajax({
+	        url:serverurl,
+	        method: 'post',
+	        dataType:'json',
+			data: {values:{k:'GetReportList',username:username}}
+        },function(ret,err)
+        {
+			if (ret)
+			{
+				//alert(JSON.stringify(ret));
+				//rptretlist=ret;
+				//把结果存在文件里
+				api.writeFile(
+				{
+				    path: 'fs://reportList.json',
+				    data: $api.jsonToStr(ret)
+				}, function(ret, err)
+				{
+				    if (ret) 
+				    {
+				        //alert("1111");
+				    } 
+				    else 
+				    {
+						//alert(ret.status);
+				    }
+				});
+				//打开报表列表
+				myUICityList.open({
+				    rect: {
+				        x: 0,
+				        y: 0,
+				        w: api.frameWidth,
+				        h: api.frameHeight
+				    },
+				    resource:"fs://reportList.json",//'widget://res/reportList.json',
+					   hotTitle: "热门报表",
+					   placeholder: "名字，字母",
+					    styles: 
+					    {
+					        searchBar: 
+					        {
+					            bgColor: 'rgba(255,255,255,0)',
+					            cancelColor: 'rgba(200,0,0,1)'
+					        },
+					        location: 
+					        {
+					            color: 'rgba(0,0,200,1)',
+					            size: 14
+					        },
+					        sectionTitle: 
+					        {
+					            bgColor: 'rgba(238,238,238,1)',
+					            color: '#0883D9',
+					            size: 14
+					           // height: 40
+					        },
+					        item: 
+					        {
+					            bgColor: 'rgba(255,255,255,1)',
+					            activeBgColor: '#ccc',
+					            color: 'rgba(0,0,0,1)',
+					            size: 14
+					          //  height: 40
+					        },
+					        indicator: 
+					        {
+					            bgColor: 'rgba(255,255,255,0)',
+					            color: '#0883D9'
+					        }
+					    },
+					    fixedOn: api.frameName
+					}, function(ret, err)
+					{
+						if(ret.eventType == 'selected')
+						{
+							if (ret.cityInfo.URL=='1')
+							{
+								alert('该报表未开发');
+							}
+							else
+							{
+								api.openWin({
+		                            name: 'Chartshow',
+		                            url: '../reporthtml/Chartshow_win.html',
+		                            pageParam: {URL:ret.cityInfo.URL}
+	                            });
+                            }
+						}
+					});				
+         		///字段信息错误隐藏加载
+				api.hideProgress();	
+			}
+        	else 
+        	{
+         		alert(JSON.stringify(err));
+         		///字段信息错误隐藏加载
+				api.hideProgress();
+         	}        	
+        });
+	};
+
+</script>
+</html>

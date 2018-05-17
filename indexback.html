@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>EIP Moblie</title>
+    <script type="text/javascript" src="./script/api.js"></script>
+	<script type="text/javascript" src="./script/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="./script/jquery.mobile-1.4.5.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+    <style type="text/css">
+    html,body{
+        height: 100%;
+    }
+    #wrap{
+        height: 100%;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-flex-flow: column;
+    }
+    #header{
+        text-align: center; 
+		background-color: #81a9c3; 
+		color: #fff;
+        width: 100%;
+    }
+    #header h1{
+        font-size: 20px; 
+		height: 44px; 
+		line-height: 44px; 
+		margin: 0em; 
+		color: #fff;
+    }
+    #main{
+        -webkit-box-flex: 1; 
+        -webkit-flex: 1;
+    }
+    #footer{
+        height: 30px; 
+		line-height: 30px;
+        background-color: #81a9c3; 
+        width: 100%;
+        text-align: center;
+    }
+    #footer h5{
+        color: white;
+    }
+    .con{
+		font-size: 28px; 
+		text-align: center;
+	}
+    </style>
+</head>
+<body>
+<!--    <div id="wrap">
+        <div id="header">
+            <h1>EIP Moblie</h1>
+            <img src="./image/Logo.png" style="height: 50px;" />
+        </div>
+        <div id="main">
+                
+        </div>
+        <div id="footer">
+            <h5>Copyright &copy;<span id="year"></span> </h5>
+        </div>
+    </div> -->
+ 
+	<div data-role="page" id="Loginpage">
+		<div id="header" data-role="header" data-position="fixed" style="text-align: center;">
+	        <img src="./image/Logo.png" style="height: 30px;" />
+		</div>
+	    <div data-role="content" id="homeContent">
+            <label for="userdomain">公 司 域</label>
+            <select id="userdomain" data-native-menu="false" data-mini="true" autofocus>
+                <option value="LDAP://dc=sailunjinyu,dc=com">SAILUNJINYU</option>
+                <option value="LDAP://dc=jinyutyres,dc=com">JINYUTYRES</option>
+                <option value="LDAP://dc=jinyutires,dc=com">JINYUTIRES</option>
+                <option value="LDAP://dc=sailuntyre,dc=com">SAILUNTYRE</option>
+                <option value="LDAP://dc=svtyre,dc=com">SVTYRE</option>
+                <option value="LDAP://dc=peacedovetyre,dc=com">PEACEDOVETYRE</option>
+                <option value="LDAP://dc=sailungroup,dc=com">SAILUNGROUP</option>
+            </select>
+            <br />
+            <label for="username">用 户 名</label>
+            <input type="text" id="username" name="username" placeholder="请输入用户名" data-mini="true" />
+            <span></span>
+            <br />
+            <label for="userpassword" data-mini="true" >密    码</label>
+            <input type="password" id="userpassword" name="userpassword" placeholder="请输入密码 " data-mini="true" />
+            <span></span>
+            <br />
+            <input type="button" value="登 录" data-mini="true" id="btnSubmit" />
+	    </div>
+	    <div data-role="footer" data-position="fixed">
+			<h3>版权@2016</h3>
+	    </div>
+    </div>
+
+</body>
+<script type="text/javascript">
+    apiready = function(){
+		console.log("Hello APICloud");
+        var header = $api.byId('header');
+        $api.fixStatusBar(header);
+        var headerH = $api.offset(header).h;
+		var footerH = 30;
+		var frameH = api.winHeight - headerH - footerH;
+		var LoginDate = localStorage.getItem('LoginDate');
+		var CurrentDate = new Date();
+		//用户名存在,登录时间不超过14天的直接进入主界面
+		if (String(localStorage.getItem('username')) != "null" && (CurrentDate-LoginDate)/1000/60/60/24<=14) 
+		{
+			api.openFrame({
+				slidBackEnabled : false,
+	            name: 'EIPHome',
+	            url: 'html/Home_window.html',
+	            bounces: true,
+	            rect: {
+	                x: 0,
+	                y: headerH,
+	                w: 'auto',
+	                h: frameH
+	            	}
+	        	});
+	        	
+		}
+		else//用户名不存在或者登录超过14天或者存储的用户名和密码无法通过域验证的到登录界面
+		{
+			//alert("aaaa");
+			localStorage.clear();
+			//localStorage.removeitem("password");
+			//localStorage.removeitem("LoginDate");
+			
+			api.openWin({
+			slidBackEnabled :false,
+	        name: 'login',
+	        url: 'html/login.html',
+	        reload:true
+        	});
+        	
+		}
+
+    };
+</script>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css'/>
+	<script type="text/javascript" src="../script/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript"> 
+
+    </script>
+    
+    <style>
+        .PersonSelector
+        {
+            background: #00FF00 ;
+            background-size: 1px 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .PersonSelector:active
+        {
+            background: #7F0000 ;
+            background-size: 1px 100%;
+        }
+    </style>
+</head>
+<body>
+<!--	<a href="javascript:gets();">获取</a>
+	<textarea id="ttt" cols="50" rows="10"></textarea> -->
+    <div id='form' class="container-fluid">
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/sendmessage.js"></script>
+<script type="text/javascript">
+
+	var username=localStorage.getItem('username');
+	var FormID="";
+	var ActivityName="";
+	var sn="";
+	var ProcessFullName="";
+	var serverurl="https://smartforms.sailunjinyu.com/eipmobile/workflow.ashx";
+	var WFApprovalurl="https://smartforms.sailunjinyu.com/eipmobile/workflowApproval.ashx";
+	var formitem = [];
+	var formColumn = [];
+	var NodeNamelist = [];
+	var MustFill=[];
+	var TextAreaInfo=[];
+	var Comment="";
+	var message="";
+	var selectedPersons_persons = [];
+	
+    function each(arr, callback){
+        for(var idx in arr)
+        {
+            formitem = arr[idx];
+
+            if("function" === typeof callback)
+            {
+                callback(idx, formitem);
+            }
+        }
+    };
+
+ 	function SubmitWorkFlow(ActionName)
+ 	{
+
+ 		var isok='ok';
+ 		///判断必填项
+ 		
+		for (var i=0;i<MustFill.length;i++)
+		{
+			if($api.byId(MustFill[i]).value=='')
+			{
+				isok='not_ok';
+				alert('带*号的必须填写');
+			}
+		}
+
+		//字段信息没有问题
+		if (isok=='ok')
+		{
+			
+			var SubmitString="";
+			//提交流程
+			api.showProgress({});
+			///循环处理界面字段，组装返回的字符串
+			for (var i=0;i<NodeNamelist.length;i++)
+			{
+				for (var j=0;j<formColumn.length;j++)
+				{
+					///节点名称和字段信息里的节点名称一致时处理
+					if(NodeNamelist[i].NodeName==formColumn[j].NodeName && (formColumn[j].isDisabled=='enable' || formColumn[j].isDisabled=='0' || formColumn[j].ColumnType=='DateType' ||formColumn[j].ColumnType=='SPersonSelector' || formColumn[j].ColumnType=='MPersonSelector' || formColumn[j].ColumnType=='DSSelectorInit' || formColumn[j].ColumnType=='DSSelector'))
+					{
+						///如果是选择类型的，编码也加进去
+						if (formColumn[j].ColumnType=='SPersonSelector' || formColumn[j].ColumnType=='MPersonSelector' || formColumn[j].ColumnType=='DSSelectorInit' || formColumn[j].ColumnType=='DSSelector')
+						{
+							SubmitString=SubmitString+'{"NodeName":"'+formColumn[j].NodeName+'","xColumn":"'+formColumn[j].xColumn+'","value":"'+$api.byId(formColumn[j].xColumn).value+'","xColumnCode":"'+formColumn[j].xColumn+'Code","valueCode":"'+$api.byId(formColumn[j].xColumn+'code').value+'"},';
+						}
+						else if(formColumn[j].ColumnType=='RichText')
+						{
+							SubmitString=SubmitString+'{"NodeName":"'+formColumn[j].NodeName+'","xColumn":"'+formColumn[j].xColumn+'","value":"'+tinyMCE.get(formColumn[j].xColumn).getContent({'format':'text'}).replace(/\"/g,"”")+'"},';
+							
+							//如果是签字意见，就保存
+							if (formColumn[j].NodeName == '签字意见' && formColumn[j].xColumn=='Comment')
+							{
+								Comment=tinyMCE.get(formColumn[j].xColumn).getContent({'format':'text'}).replace(/\"/g,"”")
+							}
+						}
+						else
+						{
+							//var value=
+							SubmitString=SubmitString+'{"NodeName":"'+formColumn[j].NodeName+'","xColumn":"'+formColumn[j].xColumn+'","value":"'+$api.byId(formColumn[j].xColumn).value.replace(/\"/g,"”")+'"},';
+						}
+					}
+				}
+			}
+			SubmitString='['+SubmitString.substring(0,SubmitString.length-1)+']'
+			//alert(FormID+'-'+username+'-'+sn+'-'+ProcessFullName+'-'+ActivityName+'-'+ActionName+'-'+SubmitString);
+
+				/*api.writeFile(
+				{
+				    path: 'fs://aa.txt',
+				    data: SubmitString
+				}, function(ret, err)
+				{
+				    if (ret) 
+				    {
+				        //alert("1111");
+				    } 
+				    else 
+				    {
+						//alert(ret.status);
+				    }
+				});
+				*/
+			api.ajax({
+	            url:WFApprovalurl,
+	        	method: 'post',
+	        	dataType:'text',
+	        	//data:{values:{k:'wfsp_gettest',String:SubmitString}}
+				data: {values:{k:'StartWFApproval',FormID:FormID,ADAccount:username,sn:sn,ProcessFullName:ProcessFullName,ActivityName:ActivityName,ActionName:ActionName,GetSQL:SubmitString,Comment:Comment}}
+            },function(ret,err)
+            {
+
+	        	if (ret)
+	        	{
+	        		//流程处理成功
+	        		if(ret=='ok')
+	        		{
+	        			alert('流程处理成功');
+	        			//删除待办对应的流程
+						api.execScript({
+				            name: 'WFMyDoList',
+				            frameName: 'WFMyDoList_frm',
+				            script: 'deletemydoListitem("'+FormID+'");'
+			        	});
+			        	//发送通知
+						api.ajax({
+	                        url:WFApprovalurl,
+	                        method: 'post',
+	        				dataType:'text',
+	        				data: {values:{k:'JPushSendMessage',FormID:FormID,message:message}}
+                        },function(ret,err)
+                        {
+                        	//coding...
+							//关闭窗口
+		        			api.closeWin({});
+                        });
+                        
+	        			//关闭窗口
+	        			//api.closeWin({});
+
+	        		}
+	        		//数据处理失败
+	        		if(ret=='updataerror')
+	        		{
+	        			alert('数据更新失败，请联系管理员');
+	        			//关闭窗口
+	        			api.closeWin({});
+	        		}
+	        		//流程处理失败
+	        		if(ret=='wfprocesserror')
+	        		{
+	        			alert('流程处理失败，请联系管理员');
+	        			//关闭窗口
+	        			api.closeWin({});
+	        		}	        		        		
+
+					api.hideProgress();
+	        	}
+	        	else
+	        	{
+	        		api.alert({msg:JSON.stringify(err)});
+	        		api.hideProgress();
+	        	}
+	        	
+            });
+		}
+		//api.hideProgress();
+ 	}; 
+ 	 	
+ 	function OpenNodeShowTable(id)
+ 	{
+		api.openWin({
+	        name: 'WFMyDoShowTableform_win',
+	        url: 'WFMyDoShowTableform_win.html',
+	        pageParam: {FormID:FormID,NodeName:NodeNamelist[id].NodeName,ActivityName:ActivityName}
+        });
+       //alert(NodeNamelist[id].NodeName);
+ 	}; 
+ 	function OpenNodeShowtList(id)
+ 	{
+		api.openWin({
+	        name: 'WFMyDoShowListform_win',
+	        url: 'WFMyDoShowListform_win.html',
+	        pageParam: {FormID:FormID,NodeName:NodeNamelist[id].NodeName,ActivityName:ActivityName}
+        });
+        //alert(NodeNamelist[id].NodeName);
+ 	}; 
+	//打开人员选择器
+ 	function OpenPersonSelector(ControlID)
+ 	{
+ 		//alert(ControlID);
+		api.openWin({
+	        name: 'PersonSelector_win',
+	        url: 'PersonSelector_win.html',
+	        pageParam: {ControlID:ControlID}
+        });
+ 	};
+	//获取人员选择器结果
+ 	function GetPersonSelectorRet(ControlID,name,ADAccount)
+ 	{
+		//$api.byId('BusinessUser').val(el, name);
+		//alert(ADAccount);
+		$api.val($api.byId(ControlID), name);
+		$api.val($api.byId(ControlID+'code'), ADAccount);
+		//alert($api.byId(ControlID+'code').value);
+ 	};
+ 	 	
+    
+    //打开多人选择器
+    function OpenMPersonSelector( ControlID )
+    {
+    	//alert(ControlID);
+        api.openWin({
+            name: 'MPersonSelector_win',
+            url: 'MPersonSelector_win.html',
+            pageParam: {ControlID: ControlID,selectedPersons_persons:selectedPersons_persons}
+        });
+    }
+    
+    //绑定回传回来的多人数据
+    function callback_bind2input(controlID,data) 
+    {
+        selectedPersons_persons = data;
+
+        var obj_input = $api.byId(controlID);
+        var obj_input_code = $api.byId(controlID+'code');
+        var str_input = '';
+        var str_input_code = '';
+        for(var i = 0; i<selectedPersons_persons.length; i++)
+        {
+            str_input += selectedPersons_persons[i]['title'] + ';';
+            str_input_code += selectedPersons_persons[i]['ADAccount'] + ';';
+        }
+        str_input=str_input.substr(0,str_input.length-1);
+        str_input_code=str_input_code.substr(0,str_input_code.length-1);
+        //obj_input.val(str_input);
+        $api.val(obj_input, str_input);
+        //obj_input_code.val(str_input_code);
+        $api.val(obj_input_code, str_input_code);
+        //alert($api.byId(controlID+'code').value);
+    }
+        
+ 	//打开数据源选择器
+ 	function OpenDSSelector(ControlID)
+ 	{
+		api.openWin({
+	        name: 'DSSelector_win',
+	        url: 'DSSelector_win.html',
+	        pageParam: {ControlID:ControlID,xColumn:ControlID,FormID:FormID,ActivityName:ActivityName}
+        });
+       //alert(NodeNamelist[id].NodeName);
+ 	};
+	//获取数据源选择器结果
+ 	function GetDSSelectorRet(ControlID,location,Code)
+ 	{
+		//$api.byId('BusinessUser').val(el, name);
+		//alert(ControlID);
+		$api.val($api.byId(ControlID), location);
+		$api.val($api.byId(ControlID+'code'), Code);
+		//alert($api.byId(ControlID+'code').value);
+ 	};
+ 	
+ 	//获取日期数据
+  	function GetDateRet(ControlID)
+ 	{
+		api.openPicker({
+            type: 'date',
+            title: '选择日期'
+        },function(ret_date,err)
+        {
+        	if (ret_date)
+        	{
+        		api.openPicker({
+                    type:'time',
+                    title:'选择时间'
+                },function(ret_time,err)
+                {
+					if(ret_time)
+					{
+						$api.byId(ControlID).value = ret_date.year + '-' + ret_date.month + '-' + ret_date.day + ' ' + ret_time.hour + ':' + ret_time.minute;
+					}
+					else
+					{
+						alert('时间选择器发生错误');
+					}
+                });
+        	}
+        	else
+        	{
+        		alert('时间选择器发生错误');
+        	}
+        });
+        
+		$api.val($api.byId(ControlID), location);
+
+		//alert($api.byId(ControlID+'code').value);
+ 	};
+ 		 
+	apiready = function()
+	{
+		
+		FormID=api.pageParam.FormID;
+		ActivityName=api.pageParam.ActivityName;
+		sn=api.pageParam.sn;
+		message="有一条流程到达，请查询，流程号为："+FormID
+        //显示加载动画
+		api.showProgress({});
+		//获取流程节点数据
+		api.ajax({
+			url:serverurl,
+	        method: 'post',
+	        dataType:'json',
+			data: {values:{k:'GetMyDoListNodeName',ADAccount:username,FormID:FormID,ActivityName:ActivityName}}
+	        
+        },function(ret,err)
+        {
+        	if (ret)
+        	{
+        		NodeNamelist=ret
+        		//api.alert({msg:JSON.stringify(NodeNamelist)});
+				ProcessFullName=NodeNamelist[0].ProcessFullName;
+				//从服务器获取流程字段数据
+				api.ajax({
+					url:serverurl,
+			        method: 'post',
+			        dataType:'json',
+					data: {values:{k:'GetMyDoListForm',ADAccount:username,FormID:FormID,ActivityName:ActivityName}}
+			        
+		        },function(ret,err)
+		        {
+		
+		        	//如果返回成功返回结果
+		        	if (ret)
+		        	{
+		        		///把获取的表单的结果保存起来，点击同意或者拒绝按钮的时候用
+		        		formColumn=ret;
+						//var rettest=$api.strToJson(ret);
+						//alert(JSON.stringify( ret ));
+		        		//var rettest=JSON.parse(ret);
+		        		//alert(JSON.stringify( rettest ));
+		        		var inputGroupStr="";//"<div class='page-header'><h3 align='center'>"+NodeNamelist[0].ProcessFullName+"</h3></div>"
+						var inputGroupWidth = 12;
+						//alert(NodeNamelist[0].ProcessFullName);
+						//从流程节点里循环取数据
+						for(var idx in NodeNamelist)
+						{
+							var NodeName;
+							var ShowType;
+							NodeName = NodeNamelist[idx].NodeName;
+							ShowType = NodeNamelist[idx].ShowType;
+							inputGroupStr += "<div class='row'>";
+							inputGroupStr += "<div class='col-xs-12'><h4>"+NodeName+"</h4>";
+							inputGroupStr += "<div class='row'>";
+							var buttonGroupStr = "<div class='col-xs-12'><h4> </h4> </div> <div class='col-xs-12'><div class='btn-group btn-group-justified'>";
+							
+							//循环取出每个节点的数据
+							each(ret, function(index, inputInfo)
+							{	
+								//节点名称和数据的节点名称一样，并且ShowType为"form"的已表单显示
+								if (ret[index].NodeName==NodeName && ShowType=="form")
+								{
+									//保存必填字段
+									if (ret[index].MustFill=='1')
+									{
+									
+										MustFill[MustFill.length]=inputInfo.xColumn
+										//alert(MustFill[index]);
+									}					
+									var label = inputInfo.xColumnName || "标签" + index;
+									var ActionName=inputInfo.ActionName;
+									var type = inputInfo.ColumnType || "text";
+									var id = inputInfo.xColumn || "";
+									var placeholder = inputInfo.xColumnName || "";
+									var disabled = (inputInfo.isDisabled=="readonly") ? "readonly" : "";
+									var value = inputInfo.Data || "";
+									var WebHigh = inputInfo.WebHigh || "3";
+									var buttonstyle = "btn btn-info";//按钮默认样式
+									var buttonStr="";
+									var inputStr="";
+									
+									//如果是输入框，又不是按钮类型的，把数据清空
+									if (inputInfo.InputForm=="1" && type!="button")
+									{
+										value="";
+									}
+									
+									if(type!="RichText" && type!="button")
+									{
+										//人员选择器
+										if( type=="SPersonSelector")
+										{
+											var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='text' class='form-control' style='background-color:white' id='" + id + "' "+ disabled + " value='" + value + "' /><span class='input-group-addon PersonSelector' onclick='OpenPersonSelector(&quot;" + id + "&quot;)'>选择</span><input type='hidden'  id='"+ id +"code'/></div></div>";
+											//alert(inputStr);
+										}
+										//多人选择器
+										else if (type == "MPersonSelector") {
+                                            var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='text' class='form-control' style='background-color:white' id='" + id + "' " + disabled + " value='" + value + "' /><span class='input-group-addon PersonSelector' onclick='OpenMPersonSelector(&quot;" + id + "&quot;)'>选择</span><input type='hidden'  id='" + id + "code'/></div></div>";
+                                        }
+										//数据源选择器
+										else if( type=="DSSelector" || type=="DSSelectorInit")
+										{
+											var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='text' class='form-control' style='background-color:white' id='" + id + "' "+ disabled + " value='" +value+ "' /><span class='input-group-addon PersonSelector' onclick='OpenDSSelector(&quot;"+id+"&quot;)'>选择</span><input type='hidden'  id='"+ id +"code'/></div></div>";
+										}
+										//日期选择器
+										else if( type=="DateType")
+										{
+											var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='text' class='form-control' style='background-color:white' id='" + id + "' "+ disabled + " value='" +value+ "' /><span class='input-group-addon PersonSelector' onclick='GetDateRet(&quot;"+id+"&quot;)'>选择</span></div></div>";
+										}										
+										//textarea值
+										else if(type=="textarea")
+										{
+											var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><textarea class='form-control' style='background-color:white' rows='"+WebHigh+"' id='"+ id + "' "+ disabled +" >" + value + "</textarea></div></div>";
+										}					
+										else
+										{							
+											var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><input type='" + type + "' class='form-control' style='background-color:white' id='" + id + "' "+ disabled + " value='" +value+ "' /></div></div>";
+										}
+									}
+									//RichText的特殊处理
+									if(type=="RichText")
+									{
+										var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'><span class='input-group-addon'><strong>" + label + "</strong></span><textarea id='"+ id +"' >" + value + "</textarea></div></div>";
+									}
+									//button的特殊处理
+									if(type=="button")
+									{
+										if (id=="Agreed")//同意用成功的样式
+										{
+											buttonstyle = "btn btn-success";
+										}
+										if (id=="Refused")//拒绝用报警的样式
+										{
+											buttonstyle = "btn btn-danger";
+										}
+										//保存按钮的代码，与文本框独立
+										buttonStr = "<div class='btn-group'><input type='" + type + "' class='"+buttonstyle+"' id='" + id + "' value='" +label+ "' onclick='SubmitWorkFlow(&quot;"+ActionName+"&quot;)' /></div>";
+
+									}
+									//保存文本
+									inputGroupStr += inputStr;
+									//保存按钮
+									buttonGroupStr+= buttonStr;
+								}
+							});
+							//循环完毕后，文本代码加上按钮代码
+							inputGroupStr = inputGroupStr+buttonGroupStr+"</div></div>";
+							//节点名称和数据的节点名称一样，ShowType不为"form"的以按钮方式显示
+							if (ShowType=="table")
+							{
+								var value = NodeName;
+								var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'> <input type='button' class='btn btn-large btn-block btn-primary' onclick='OpenNodeShowTable("+idx+")' value='" +value+ "' /></div></div>";
+								inputGroupStr += inputStr;
+							}
+		
+							//节点名称和数据的节点名称一样，ShowType不为"form"的以按钮方式显示
+							if (ShowType=="list")
+							{
+								var value = NodeName;
+								var inputStr = "<div class='col-xs-" + inputGroupWidth + "'><div class='input-group'> <input type='button' class='btn btn-large btn-block btn-primary' onclick='OpenNodeShowtList("+idx+")' value='" +value+ "' /></div></div>";
+								inputGroupStr += inputStr;
+							}
+													
+							inputGroupStr += '</div></div></div>';
+						}
+						//把头部放最后面，避免没加载完数据，报错
+						inputGroupStr="<div class='page-header'><h3 align='center'>"+NodeNamelist[0].ProcessFullName+"</h3></div>"+inputGroupStr;
+						document.getElementById ("form").innerHTML = inputGroupStr;
+						
+						//获取流程TextArea数据
+						api.ajax({
+							url:serverurl,
+					        method: 'post',
+					        dataType:'json',
+							data: {values:{k:'CreateMoblieTextAreaShow',ADAccount:username,FormID:FormID,ActivityName:ActivityName}}
+					        
+				        },function(ret,err)
+				        {
+				        	if (ret)
+				        	{
+				        		TextAreaInfo=ret
+				        		//api.alert({msg:JSON.stringify(NodeNamelist)});
+
+								//循环初始化tinymce控件
+								for(var idx in TextAreaInfo)
+								{
+									var disabled=Boolean(Number(TextAreaInfo[idx].isDisabled));
+									var id = TextAreaInfo[idx].xColumn;
+									var height = TextAreaInfo[idx].WebHigh;
+									tinymce.init({
+								        'selector':'#'+id,
+								        'toolbar':false,
+								        'menubar':false,
+								        'statusbar':false,
+								        'readonly':true === disabled,
+								        'height':height
+								    });
+								}
+												        		
+				        	}
+				        	else
+				        	{
+				        		api.alert({msg:JSON.stringify(err)});
+				        	}
+				        });
+						///流程节点数据、流程字段信息加载成功隐藏加载
+						api.hideProgress();
+		        	}
+		        	else 
+		        	{
+		         		alert(JSON.stringify(err));
+		         		///字段信息错误隐藏加载
+						api.hideProgress();
+		         	}
+		
+		        });
+             	//结束从服务器获取流程字段数据
+        	}
+        	else
+        	{
+        		api.alert({msg:JSON.stringify(err)});
+        		///流程节点数据加载错误隐藏加载
+				api.hideProgress();
+        	}
+
+        });
+
+	};
+/*    function gets()
+	{
+	    var t = document.getElementById("ttt");
+	    t.value = document.documentElement.outerHTML;
+	}*/
+</script>
+</html>

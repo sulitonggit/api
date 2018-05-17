@@ -1,0 +1,30 @@
+﻿{
+    "topCitys": [
+        {
+            "id": "1",
+            "city": "每月考勤查询",
+            "pinyin": "meiyuekaoqinchaxun",
+            "URL": "1"
+        }
+    ],
+    "citys": [
+        {
+            "id": "1",
+            "city": "每月考勤查询",
+            "pinyin": "meiyuekaoqinchaxun",
+            "URL": "1"
+        },
+        {
+            "id": "2",
+            "city": "每日考勤查询",
+            "pinyin": "meirikaoqchaxun",
+            "URL": "1"
+        },
+        {
+            "id": "4",
+            "city": "月度薪资查询",
+            "pinyin": "yueduxinzhichax",
+            "URL": "1"
+        }
+    ]
+}
